@@ -44,7 +44,7 @@
             </button>
             <div x-show="openSection === 'proxmox'" x-collapse class="pl-11 space-y-1">
                 <a href="{{ route('proxmox.nodes') }}"
-                    class="block py-1.5 text-sm {{ request()->routeIs('proxmox.nodes') ? 'text-blue-400 font-bold' : 'text-slate-500 hover:text-blue-400' }}">Node</a>
+                    class="block py-1.5 text-sm {{ request()->routeIs('proxmox.nodes') ? 'text-blue-400 font-bold' : 'text-slate-500 hover:text-blue-400' }}">VM AGS</a>
                 <a href="{{ route('proxmox.storage') }}"
                     class="block py-1.5 text-sm {{ request()->routeIs('proxmox.storage') ? 'text-blue-400 font-bold' : 'text-slate-500 hover:text-blue-400' }}">Storage</a>
                 <a href="{{ route('proxmox.vms') }}"

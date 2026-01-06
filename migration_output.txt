@@ -1,0 +1,32 @@
+﻿
+  Dropping all tables  121ms DONE
+
+   INFO  Preparing database.  
+
+  Creating migration table  28ms DONE
+
+   INFO  Running migrations.  
+
+  2024_01_01_000000_create_users_table  15ms FAIL
+
+   Illuminate\Database\QueryException 
+
+  SQLSTATE[42000]: Syntax error or access violation: 1071 Specified key was too long; max key length is 1000 bytes (Connection: mysql, SQL: alter table `users` add unique `users_email_unique`(`email`))
+
+  at vendor\laravel\framework\src\Illuminate\Database\Connection.php:829
+    825Ôûò                     $this->getName(), $query, $this->prepareBindings($bindings), $e
+    826Ôûò                 );
+    827Ôûò             }
+    828Ôûò 
+  Ô×£ 829Ôûò             throw new QueryException(
+    830Ôûò                 $this->getName(), $query, $this->prepareBindings($bindings), $e
+    831Ôûò             );
+    832Ôûò         }
+    833Ôûò     }
+
+  1   vendor\laravel\framework\src\Illuminate\Database\Connection.php:587
+      PDOException::("SQLSTATE[42000]: Syntax error or access violation: 1071 Specified key was too long; max key length is 1000 bytes")
+
+  2   vendor\laravel\framework\src\Illuminate\Database\Connection.php:587
+      PDOStatement::execute()
+

@@ -1,0 +1,9 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # If the request is already to the public folder, don't redirect
+    RewriteCond %{REQUEST_URI} !^/Maintenance-Dashboard/public/
+    
+    # Redirect all other requests to public folder
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>

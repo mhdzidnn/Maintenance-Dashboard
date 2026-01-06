@@ -1,6 +1,6 @@
 # 🏢 IT Persero Batam - Maintenance Dashboard 🏢
 
-A premium, modern, and high-density dashboard for monitoring Proxmox nodes, storage health, VM usage, and Nextcloud statistics. Built with **Laravel 11**, **Livewire 3**, **Tailwind CSS**, and **Chart.js**.
+A premium, modern, and high-density dashboard for monitoring Proxmox nodes, storage health, VM usage, and Nextcloud statistics. Built with **Laravel 10**, **Livewire 3**, **Tailwind CSS**, and **Chart.js**.
 
 ---
 
@@ -10,10 +10,10 @@ If you just cloned this repository for the first time, follow these steps to get
 
 ### 1. Prerequisites
 Ensure you have the following installed:
-- **PHP 8.2 or higher**
+- **PHP 8.1 or higher**
 - **Composer**
 - **Node.js & NPM**
-- **SQLite** (or your preferred database)
+- **MySQL** (WAMP/XAMPP or standalone)
 
 ### 2. Install Dependencies
 ```bash
@@ -33,30 +33,48 @@ cp .env.example .env
 php artisan key:generate
 ```
 
+Edit your `.env` file and configure your MySQL database:
+```env
+APP_URL=http://localhost/Maintenance-Dashboard/public
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=maintenance_dashboard
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+> [!IMPORTANT]
+> Make sure to set `APP_URL` to match your WAMP setup path for proper asset loading.
+
 ### 4. Database Setup
 The dashboard relies on dummy data for all visualizations. Run the migration and seeders to populate your database:
 ```bash
-# Create SQLite database (if using default)
-touch database/database.sqlite
-
-# Run migrations and seed the dummy data
+# Create the database first in MySQL
+# Then run migrations and seed the dummy data
 php artisan migrate --seed
 ```
 
 ### 5. Running the Application
-You need to run both the Laravel server and the Vite dev server for icons and charts to work:
 
-**Terminal 1 (Laravel Server):**
+**For WAMP Users (Recommended):**
+1. Make sure WAMP is running
+2. Run Vite dev server for icons and CSS:
+   ```bash
+   npm run dev
+   ```
+3. Visit `http://localhost/Maintenance-Dashboard/public/` in your browser
+
+**Alternative - Using Laravel's Built-in Server:**
 ```bash
+# Terminal 1: Laravel Server
 php artisan serve
-```
 
-**Terminal 2 (Vite Server - Icons & CSS):**
-```bash
+# Terminal 2: Vite Server
 npm run dev
 ```
-
-Visit `http://localhost:8000` in your browser.
+Then visit `http://localhost:8000` in your browser.
 
 ---
 
@@ -67,9 +85,10 @@ Visit `http://localhost:8000` in your browser.
 - **Frontend Interaction**: Alpine.js & Livewire 3
 
 ## 📊 Features
-- node status tracking (prox01)
-- Storage health monitoring (LOCAL-LVM)
-- Usage trend visualizations
-- Nextcloud user & storage statistics
-- System alerts with priority levels
-- Quick management actions
+- **Node Monitoring**: Real-time Proxmox node status tracking
+- **Storage Health**: Monitor storage usage and health metrics (LOCAL-LVM)
+- **Virtual Machines**: Track VM status, CPU, memory, and disk usage
+- **Nextcloud Integration**: User statistics and storage analytics
+- **System Alerts**: Priority-based alert system with status tracking
+- **Usage Visualizations**: Interactive charts for trend analysis
+- **Quick Actions**: Fast access to common management tasks

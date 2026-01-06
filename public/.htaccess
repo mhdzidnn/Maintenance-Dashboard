@@ -4,6 +4,9 @@
     </IfModule>
 
     RewriteEngine On
+    
+    # Set the base path for WAMP subfolder
+    RewriteBase /Maintenance-Dashboard/public/
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
@@ -19,3 +22,4 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
