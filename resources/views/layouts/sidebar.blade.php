@@ -1,8 +1,12 @@
 <aside x-data="{
-    openSection: localStorage.getItem('sidebar_section') || null,
+    openSections: [],
     toggleSection(section) {
-        this.openSection = this.openSection === section ? null : section;
-        localStorage.setItem('sidebar_section', this.openSection);
+        if (this.openSections.includes(section)) {
+            this.openSections = this.openSections.filter(s => s !== section);
+        } else {
+            this.openSections.push(section);
+        }
+        localStorage.setItem('sidebar_sections', JSON.stringify(this.openSections));
     }
 }"
     class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col h-full transition-all duration-300">
@@ -31,26 +35,71 @@
             <span class="font-medium">Dashboard</span>
         </a>
 
-        <!-- Proxmox Section -->
+        <!-- Proxmox AGS -->
         <div class="space-y-1">
-            <button @click="toggleSection('proxmox')"
+            <button @click="toggleSection('proxmox_ags')"
                 class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
                 <div class="flex items-center space-x-3">
                     <i data-lucide="server" class="w-5 h-5 group-hover:text-blue-400"></i>
-                    <span class="font-medium">Proxmox</span>
+                    <span class="font-medium">Proxmox AGS</span>
                 </div>
                 <i data-lucide="chevron-right" class="w-4 h-4 transition-transform duration-200"
-                    :class="openSection === 'proxmox' ? 'rotate-90' : ''"></i>
+                    :class="openSections.includes('proxmox_ags') ? 'rotate-90' : ''"></i>
             </button>
-            <div x-show="openSection === 'proxmox'" x-collapse class="pl-11 space-y-1">
-                <a href="{{ route('proxmox.nodes') }}"
-                    class="block py-1.5 text-sm {{ request()->routeIs('proxmox.nodes') ? 'text-blue-400 font-bold' : 'text-slate-500 hover:text-blue-400' }}">VM AGS</a>
-                <a href="{{ route('proxmox.storage') }}"
-                    class="block py-1.5 text-sm {{ request()->routeIs('proxmox.storage') ? 'text-blue-400 font-bold' : 'text-slate-500 hover:text-blue-400' }}">Storage</a>
-                <a href="{{ route('proxmox.vms') }}"
-                    class="block py-1.5 text-sm {{ request()->routeIs('proxmox.vms') ? 'text-blue-400 font-bold' : 'text-slate-500 hover:text-blue-400' }}">VMs</a>
-                <a href="{{ route('proxmox.memory') }}"
-                    class="block py-1.5 text-sm {{ request()->routeIs('proxmox.memory') ? 'text-blue-400 font-bold' : 'text-slate-500 hover:text-blue-400' }}">Memory</a>
+            <div x-show="openSections.includes('proxmox_ags')" x-collapse class="pl-11 space-y-1">
+                <a href="{{ route('proxmox.nodes', ['location' => 'ags']) }}"
+                    class="block py-1.5 text-sm {{ request()->routeIs('proxmox.nodes') && request('location') == 'ags' ? 'text-blue-400 font-bold' : 'text-slate-500 hover:text-blue-400' }}">VM</a>
+            </div>
+        </div>
+
+        <!-- Proxmox Kantor Pusat -->
+        <div class="space-y-1">
+            <button @click="toggleSection('proxmox_pusat')"
+                class="w-full text-left flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
+                <div class="flex items-center space-x-3">
+                    <i data-lucide="server" class="w-5 h-5 group-hover:text-blue-400"></i>
+                    <span class="font-medium">Proxmox Kantor Pusat</span>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 transition-transform duration-200"
+                    :class="openSections.includes('proxmox_pusat') ? 'rotate-90' : ''"></i>
+            </button>
+            <div x-show="openSections.includes('proxmox_pusat')" x-collapse class="pl-11 space-y-1">
+                <a href="{{ route('proxmox.nodes', ['location' => 'pusat']) }}"
+                    class="block py-1.5 text-sm {{ request()->routeIs('proxmox.nodes') && request('location') == 'pusat' ? 'text-blue-400 font-bold' : 'text-slate-500 hover:text-blue-400' }}">VM</a>
+            </div>
+        </div>
+
+        <!-- Proxmox Punggur -->
+        <div class="space-y-1">
+            <button @click="toggleSection('proxmox_punggur')"
+                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
+                <div class="flex items-center space-x-3">
+                    <i data-lucide="server" class="w-5 h-5 group-hover:text-blue-400"></i>
+                    <span class="font-medium">Proxmox Punggur</span>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 transition-transform duration-200"
+                    :class="openSections.includes('proxmox_punggur') ? 'rotate-90' : ''"></i>
+            </button>
+            <div x-show="openSections.includes('proxmox_punggur')" x-collapse class="pl-11 space-y-1">
+                <a href="{{ route('proxmox.nodes', ['location' => 'punggur']) }}"
+                    class="block py-1.5 text-sm {{ request()->routeIs('proxmox.nodes') && request('location') == 'punggur' ? 'text-blue-400 font-bold' : 'text-slate-500 hover:text-blue-400' }}">VM</a>
+            </div>
+        </div>
+
+        <!-- Proxmox Sekupang -->
+        <div class="space-y-1">
+            <button @click="toggleSection('proxmox_sekupang')"
+                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
+                <div class="flex items-center space-x-3">
+                    <i data-lucide="server" class="w-5 h-5 group-hover:text-blue-400"></i>
+                    <span class="font-medium">Proxmox Sekupang</span>
+                </div>
+                <i data-lucide="chevron-right" class="w-4 h-4 transition-transform duration-200"
+                    :class="openSections.includes('proxmox_sekupang') ? 'rotate-90' : ''"></i>
+            </button>
+            <div x-show="openSections.includes('proxmox_sekupang')" x-collapse class="pl-11 space-y-1">
+                <a href="{{ route('proxmox.nodes', ['location' => 'sekupang']) }}"
+                    class="block py-1.5 text-sm {{ request()->routeIs('proxmox.nodes') && request('location') == 'sekupang' ? 'text-blue-400 font-bold' : 'text-slate-500 hover:text-blue-400' }}">VM</a>
             </div>
         </div>
 
@@ -63,9 +112,9 @@
                     <span class="font-medium">Nextcloud</span>
                 </div>
                 <i data-lucide="chevron-right" class="w-4 h-4 transition-transform duration-200"
-                    :class="openSection === 'nextcloud' ? 'rotate-90' : ''"></i>
+                    :class="openSections.includes('nextcloud') ? 'rotate-90' : ''"></i>
             </button>
-            <div x-show="openSection === 'nextcloud'" x-collapse class="pl-11 space-y-1">
+            <div x-show="openSections.includes('nextcloud')" x-collapse class="pl-11 space-y-1">
                 <a href="{{ route('nextcloud.overview') }}"
                     class="block py-1.5 text-sm {{ request()->routeIs('nextcloud.overview') ? 'text-emerald-400 font-bold' : 'text-slate-500 hover:text-emerald-400' }}">Overview</a>
                 <a href="{{ route('nextcloud.users') }}"
@@ -84,9 +133,9 @@
                     <span class="font-medium">System</span>
                 </div>
                 <i data-lucide="chevron-right" class="w-4 h-4 transition-transform duration-200"
-                    :class="openSection === 'system' ? 'rotate-90' : ''"></i>
+                    :class="openSections.includes('system') ? 'rotate-90' : ''"></i>
             </button>
-            <div x-show="openSection === 'system'" x-collapse class="pl-11 space-y-1">
+            <div x-show="openSections.includes('system')" x-collapse class="pl-11 space-y-1">
                 <a href="{{ route('system.alerts') }}"
                     class="block py-1.5 text-sm {{ request()->routeIs('system.alerts') ? 'text-amber-400 font-bold' : 'text-slate-500 hover:text-amber-400' }}">Alerts</a>
                 <a href="{{ route('system.logs') }}"
@@ -104,13 +153,16 @@
                     <i data-lucide="user" class="w-5 h-5 text-slate-400"></i>
                 </div>
                 <div>
-                    <div class="text-sm font-semibold text-white">Admin</div>
+                    <div class="text-sm font-semibold text-white">{{ session('user_name', 'Guest') }}</div>
                     <div class="text-xs text-slate-500">Logout</div>
                 </div>
             </div>
-            <button class="text-slate-500 hover:text-red-400 transition-colors">
-                <i data-lucide="log-out" class="w-5 h-5"></i>
-            </button>
+            <form action="{{ route('logout') }}" method="POST" id="logout-form">
+                @csrf
+                <button type="submit" class="text-slate-500 hover:text-red-400 transition-colors">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                </button>
+            </form>
         </div>
     </div>
 </aside>
