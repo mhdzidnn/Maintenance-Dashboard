@@ -16,6 +16,49 @@
             </div>
         </div>
 
+        {{-- Notifications (Toast Style) --}}
+        @if (isset($notifications) && count($notifications) > 0)
+            <div class="fixed top-24 right-6 z-50 w-80 space-y-2 pointer-events-none" id="notification-container">
+                @foreach ($notifications as $notification)
+                    <div id="{{ $notification['id'] }}"
+                        class="notification-toast bg-slate-900/90 backdrop-blur-md border border-red-500/30 shadow-2xl shadow-red-500/20 rounded-lg p-3 flex items-start space-x-3 pointer-events-auto transition-all duration-300 hover:scale-[1.02]">
+                        <div class="p-1.5 bg-red-500/20 rounded-md shrink-0">
+                            <i data-lucide="alert-circle" class="w-4 h-4 text-red-500"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-sm font-bold text-white leading-tight mb-0.5">{{ $notification['title'] }}</h3>
+                            <p class="text-slate-400 text-xs leading-relaxed line-clamp-2">{!! $notification['message'] !!}</p>
+                            @if (isset($notification['node']))
+                                <p class="text-slate-600 text-[10px] mt-1 font-mono uppercase tracking-wider">Node:
+                                    {{ $notification['node'] }}</p>
+                            @endif
+                        </div>
+                        <button onclick="dismissNotification('{{ $notification['id'] }}')"
+                            class="p-1.5 bg-white/5 hover:bg-white/20 rounded-lg text-slate-400 hover:text-white transition-all shrink-0 border border-transparent hover:border-white/10">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="w-4 h-4">
+                                <path d="M18 6 6 18" />
+                                <path d="m6 6 12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                @endforeach
+            </div>
+
+            <script>
+                // User requested: Notifications should reappear on refresh/navigation
+                // So we only remove them from the DOM temporarily
+                function dismissNotification(id) {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.style.opacity = '0';
+                        setTimeout(() => el.remove(), 300);
+                    }
+                }
+            </script>
+        @endif
+
         {{-- VM List --}}
         <div class="grid gap-4">
             @forelse($vms as $vm)

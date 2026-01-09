@@ -154,7 +154,46 @@ class ProxmoxController extends Controller
 
         $vms = collect($allVms); // Convert array to Collection for view compatibility (count(), where(), sum())
 
-        return view('proxmox.nodes', compact('vms', 'title', 'location')); 
+        // Check for resource limits and generate notifications
+        $notifications = [];
+        foreach ($vms as $vm) {
+            if (!$vm->is_running) continue;
+
+            // CPU Usage (> 85%)
+            if ($vm->cpu_usage_percent > 85) {
+                $notifications[] = [
+                    'id' => "alert_cpu_{$vm->id}_{$location}",
+                    'type' => 'warning',
+                    'title' => 'High CPU Usage',
+                    'message' => "VM <strong>{$vm->name}</strong> is using <strong>{$vm->cpu_usage_percent}%</strong> CPU.",
+                    'node' => $vm->node->name
+                ];
+            }
+
+            // Memory Usage (> 85%)
+            if ($vm->memory_usage_percent > 85) {
+                $notifications[] = [
+                    'id' => "alert_mem_{$vm->id}_{$location}",
+                    'type' => 'warning',
+                    'title' => 'High Memory Usage',
+                    'message' => "VM <strong>{$vm->name}</strong> is using <strong>{$vm->memory_usage_percent}%</strong> Memory.",
+                    'node' => $vm->node->name
+                ];
+            }
+
+            // Disk Usage (> 450GB - assuming 500GB limit for now based on dummy data)
+            if ($vm->usage_gb > 450) {
+                 $notifications[] = [
+                    'id' => "alert_disk_{$vm->id}_{$location}",
+                    'type' => 'warning',
+                    'title' => 'Low Disk Space',
+                    'message' => "VM <strong>{$vm->name}</strong> has used <strong>{$vm->usage_gb}GB</strong> of storage (Limit: 500GB).",
+                    'node' => $vm->node->name
+                ];
+            }
+        }
+
+        return view('proxmox.nodes', compact('vms', 'title', 'location', 'notifications')); 
     }
     public function storage() { return view('proxmox.storage'); }
     public function vms() { return view('proxmox.vms'); }
