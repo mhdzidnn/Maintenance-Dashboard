@@ -101,19 +101,14 @@ Route::middleware(['auth'])->group(function () {
 Create a sidebar component with these menu items:
 ```
 📊 Dashboard (/)
-├── 🖥️ Proxmox
-│   ├── Node
-│   ├── Storage
-│   ├── VMs
-│   └── Memory
-├── ☁️ Nextcloud
-│   ├── Overview
-│   ├── Users
-│   └── Storage
-└── ⚙️ System
-    ├── Alerts
-    └── Logs
-```
+├── 🖥️ Proxmox AGS
+│   ├── VMS
+├── 🖥️ Proxmox Punggur
+│   ├── VMS
+├── 🖥️ Proxmox Kantor Pusat
+│   ├── VMS
+├── 🖥️ Proxmox Sekupang
+│   ├── VMS
 
 ### Navigation Interaction Requirements:
 - **Active state styling:** Current page should be highlighted
