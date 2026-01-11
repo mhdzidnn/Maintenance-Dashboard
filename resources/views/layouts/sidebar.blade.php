@@ -184,7 +184,7 @@
             <div class="flex items-center space-x-3">
                 <div
                     class="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center border border-white/5 shadow-inner">
-                    <i data-lucide="shield-check" class="w-5 h-5 text-blue-500/80"></i>
+                    <i data-lucide="shield" class="w-5 h-5 text-blue-500/80"></i>
                 </div>
                 <div class="flex flex-col">
                     <span
@@ -194,9 +194,9 @@
             </div>
             <form action="{{ route('logout') }}" method="POST" id="logout-form">
                 @csrf
-                <button type="submit"
-                    class="p-2.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all group">
-                    <i data-lucide="power" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
+                <button type="submit" title="Logout"
+                    class="p-2.5 rounded-xl text-slate-500 hover:text-white hover:bg-red-500 shadow-sm hover:shadow-red-500/20 transition-all duration-300 group ring-1 ring-white/5 bg-slate-800/50">
+                    <i data-lucide="log-out" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
                 </button>
             </form>
         </div>
