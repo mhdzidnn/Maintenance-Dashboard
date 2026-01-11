@@ -43,6 +43,14 @@
 <body
     class="bg-[#020617] h-screen flex items-center justify-center p-4 overflow-hidden selection:bg-blue-500/30 selection:text-blue-200">
 
+    <!-- Development Ribbon -->
+    <div class="fixed top-0 right-0 z-[9999] pointer-events-none overflow-hidden w-40 h-40">
+        <div
+            class="absolute top-8 -right-14 bg-amber-500 text-slate-900 font-black text-[10px] py-1.5 w-[200px] text-center transform rotate-45 shadow-2xl border-y border-white/10 uppercase tracking-[0.2em] whitespace-nowrap">
+            Development UI
+        </div>
+    </div>
+
     <!-- Animated background blobs -->
     <div class="fixed inset-0 z-0">
         <div
