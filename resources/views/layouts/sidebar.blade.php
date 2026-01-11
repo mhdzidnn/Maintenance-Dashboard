@@ -1,5 +1,5 @@
 <aside x-data="{
-    openSections: [],
+    openSections: JSON.parse(localStorage.getItem('sidebar_sections')) || [],
     toggleSection(section) {
         if (this.openSections.includes(section)) {
             this.openSections = this.openSections.filter(s => s !== section);
@@ -11,156 +11,192 @@
 }"
     class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col h-full transition-all duration-300">
     <!-- Logo Section -->
-    <div class="p-6 flex items-center space-x-4 border-b border-white/5">
+    <div
+        class="p-6 flex items-center space-x-4 border-b border-white/5 bg-slate-900/50 backdrop-blur-xl sticky top-0 z-10">
         <div
-            class="w-12 h-12 rounded-2xl bg-white p-1.5 flex items-center justify-center shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-white/10 group-hover:scale-105 transition-transform duration-500">
+            class="w-11 h-11 rounded-xl bg-white p-1 flex items-center justify-center shadow-[0_0_20px_rgba(59,130,246,0.15)] border border-white/10 group-hover:scale-105 transition-all duration-500">
             <img src="{{ asset('img/persero batam.jpeg') }}" class="w-full h-full object-contain"
                 alt="IT Persero Batam Logo">
         </div>
         <div class="flex flex-col justify-center">
-            <span class="text-lg font-black tracking-tighter text-white uppercase leading-none">IT PERSERO</span>
-            <div class="flex items-center space-x-1.5">
-                <span class="text-lg font-black tracking-tighter text-white uppercase leading-none">BATAM</span>
-                <div class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></div>
+            <span class="text-base font-black tracking-tight text-white uppercase leading-none">IT PERSERO</span>
+            <div class="flex items-center space-x-1.5 mt-1">
+                <span class="text-base font-black tracking-tight text-white uppercase leading-none">BATAM</span>
+                <div class="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)] animate-pulse">
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Navigation Section -->
-    <nav class="flex-1 px-4 space-y-1 mt-4 overflow-y-auto scrollbar-hide">
+    <nav class="flex-1 px-3 space-y-1.5 mt-6 overflow-y-auto scrollbar-hide">
         <!-- Dashboard Link -->
         <a href="{{ route('dashboard') }}"
-            class="flex items-center space-x-3 px-3 py-2.5 rounded-xl transition-all {{ request()->routeIs('dashboard') ? 'bg-blue-600/10 text-blue-400' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
-            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
-            <span class="font-medium">Dashboard</span>
+            class="group relative flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('dashboard') ? 'bg-blue-600/10 text-blue-400' : 'text-slate-400 hover:bg-slate-800/50 hover:text-white' }}">
+            @if (request()->routeIs('dashboard'))
+                <div
+                    class="absolute left-0 w-1 h-6 bg-blue-500 rounded-r-full shadow-[2px_0_10px_rgba(59,130,246,0.5)]">
+                </div>
+            @endif
+            <i data-lucide="layout-dashboard"
+                class="w-5 h-5 {{ request()->routeIs('dashboard') ? 'text-blue-400' : 'text-slate-500 group-hover:text-blue-400' }} transition-colors"></i>
+            <span class="font-semibold text-sm">Dashboard</span>
         </a>
 
-        <!-- Proxmox AGS -->
-        <div class="space-y-1">
-            <button @click="toggleSection('proxmox_ags')"
-                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
-                <div class="flex items-center space-x-3">
-                    <i data-lucide="server" class="w-5 h-5 group-hover:text-blue-400"></i>
-                    <span class="font-medium">Proxmox AGS</span>
-                </div>
-                <i data-lucide="chevron-right" class="w-4 h-4 transition-transform duration-200"
-                    :class="openSections.includes('proxmox_ags') ? 'rotate-90' : ''"></i>
-            </button>
-            <div x-show="openSections.includes('proxmox_ags')" x-collapse class="pl-11 space-y-1">
-                <a href="{{ route('proxmox.nodes', ['location' => 'ags']) }}"
-                    class="block py-1.5 text-sm {{ request()->routeIs('proxmox.nodes') && request('location') == 'ags' ? 'text-blue-400 font-bold' : 'text-slate-500 hover:text-blue-400' }}">VM</a>
-            </div>
+        @php
+            $proxmoxLocs = [
+                ['id' => 'ags', 'name' => 'Proxmox AGS', 'icon' => 'activity'],
+                ['id' => 'pusat', 'name' => 'Proxmox Kantor Pusat', 'icon' => 'activity'],
+                ['id' => 'punggur', 'name' => 'Proxmox Punggur', 'icon' => 'activity'],
+                ['id' => 'sekupang', 'name' => 'Proxmox Sekupang', 'icon' => 'activity'],
+            ];
+            $pveItems = [
+                ['id' => '6690', 'name' => '6690 (Vpn-site-to-site)', 'type' => 'lxc'],
+                ['id' => '100', 'name' => '100 (win10-multifunction)', 'type' => 'qemu'],
+                ['id' => '101', 'name' => '101 (win10in02)', 'type' => 'qemu'],
+                ['id' => '102', 'name' => '102 (win10in01)', 'type' => 'qemu'],
+                ['id' => '103', 'name' => '103 (ubuntu-24)', 'type' => 'qemu'],
+                ['id' => 'localnetwork', 'name' => 'localnetwork (pve)', 'type' => 'sdn'],
+                ['id' => 'local', 'name' => 'local (pve)', 'type' => 'storage'],
+                ['id' => 'local-lvm', 'name' => 'local-lvm (pve)', 'type' => 'storage'],
+            ];
+        @endphp
+
+        <div class="pt-4 pb-2 px-4">
+            <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500/80">Infrastructure</span>
         </div>
 
-        <!-- Proxmox Kantor Pusat -->
-        <div class="space-y-1">
-            <button @click="toggleSection('proxmox_pusat')"
-                class="w-full text-left flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
-                <div class="flex items-center space-x-3">
-                    <i data-lucide="server" class="w-5 h-5 group-hover:text-blue-400"></i>
-                    <span class="font-medium">Proxmox Kantor Pusat</span>
-                </div>
-                <i data-lucide="chevron-right" class="w-4 h-4 transition-transform duration-200"
-                    :class="openSections.includes('proxmox_pusat') ? 'rotate-90' : ''"></i>
-            </button>
-            <div x-show="openSections.includes('proxmox_pusat')" x-collapse class="pl-11 space-y-1">
-                <a href="{{ route('proxmox.nodes', ['location' => 'pusat']) }}"
-                    class="block py-1.5 text-sm {{ request()->routeIs('proxmox.nodes') && request('location') == 'pusat' ? 'text-blue-400 font-bold' : 'text-slate-500 hover:text-blue-400' }}">VM</a>
-            </div>
-        </div>
+        @foreach ($proxmoxLocs as $loc)
+            <div class="space-y-1">
+                <button @click="toggleSection('proxmox_{{ $loc['id'] }}')"
+                    class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-white transition-all group">
+                    <div class="flex items-center space-x-3">
+                        <i data-lucide="{{ $loc['icon'] }}"
+                            class="w-5 h-5 {{ in_array($loc['id'], ['ags', 'punggur']) ? 'text-blue-500' : (in_array($loc['id'], ['pusat', 'sekupang']) ? 'text-amber-500' : 'text-slate-500') }} group-hover:text-blue-400"></i>
+                        <span class="font-semibold text-[13px]">{{ $loc['name'] }}</span>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-600 transition-transform duration-300"
+                        :class="openSections.includes('proxmox_{{ $loc['id'] }}') ? 'rotate-90 text-slate-400' : ''"></i>
+                </button>
 
-        <!-- Proxmox Punggur -->
-        <div class="space-y-1">
-            <button @click="toggleSection('proxmox_punggur')"
-                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
-                <div class="flex items-center space-x-3">
-                    <i data-lucide="server" class="w-5 h-5 group-hover:text-blue-400"></i>
-                    <span class="font-medium">Proxmox Punggur</span>
-                </div>
-                <i data-lucide="chevron-right" class="w-4 h-4 transition-transform duration-200"
-                    :class="openSections.includes('proxmox_punggur') ? 'rotate-90' : ''"></i>
-            </button>
-            <div x-show="openSections.includes('proxmox_punggur')" x-collapse class="pl-11 space-y-1">
-                <a href="{{ route('proxmox.nodes', ['location' => 'punggur']) }}"
-                    class="block py-1.5 text-sm {{ request()->routeIs('proxmox.nodes') && request('location') == 'punggur' ? 'text-blue-400 font-bold' : 'text-slate-500 hover:text-blue-400' }}">VM</a>
-            </div>
-        </div>
+                <div x-show="openSections.includes('proxmox_{{ $loc['id'] }}')" x-collapse
+                    class="ml-6 pl-4 border-l border-slate-800/80 space-y-1 mt-1">
 
-        <!-- Proxmox Sekupang -->
-        <div class="space-y-1">
-            <button @click="toggleSection('proxmox_sekupang')"
-                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
-                <div class="flex items-center space-x-3">
-                    <i data-lucide="server" class="w-5 h-5 group-hover:text-blue-400"></i>
-                    <span class="font-medium">Proxmox Sekupang</span>
+                    <!-- Datacenter Dashboard Link -->
+                    <a href="{{ route('proxmox.datacenter', ['location' => $loc['id']]) }}"
+                        class="group flex items-center justify-between px-3 py-2 rounded-lg transition-all {{ request()->fullUrlIs(route('proxmox.datacenter', ['location' => $loc['id']])) ? 'bg-blue-600/10 text-blue-400 font-bold' : 'text-slate-500 hover:bg-slate-800/40 hover:text-slate-300' }}">
+                        <div class="flex items-center space-x-2">
+                            <i data-lucide="activity" class="w-4 h-4"></i>
+                            <span class="text-xs">Datacenter Summary</span>
+                        </div>
+                    </a>
+
+                    <!-- pve Node Item -->
+                    <div class="space-y-1">
+                        <button @click="toggleSection('proxmox_{{ $loc['id'] }}_pve')"
+                            class="w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-500 hover:text-slate-300 transition-all group text-xs font-medium">
+                            <div class="flex items-center space-x-2">
+                                <i data-lucide="database" class="w-4 h-4"></i>
+                                <span>pve</span>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-3 h-3 transition-transform duration-200"
+                                :class="openSections.includes('proxmox_{{ $loc['id'] }}_pve') ? 'rotate-90' : ''"></i>
+                        </button>
+
+                        <div x-show="openSections.includes('proxmox_{{ $loc['id'] }}_pve')" x-collapse
+                            class="ml-3 pl-4 border-l border-slate-800/50 space-y-0.5 mt-1">
+                            @foreach ($pveItems as $item)
+                                <a href="{{ route('proxmox.vm_detail', ['location' => $loc['id'], 'vm_id' => $item['id']]) }}"
+                                    class="group flex items-center space-x-2 py-1.5 px-3 text-[11px] rounded-lg transition-all {{ request()->routeIs('proxmox.vm_detail') && request('vm_id') == $item['id'] && request('location') == $loc['id'] ? 'bg-blue-600/10 text-blue-400 font-bold' : 'text-slate-500/80 hover:text-blue-400 hover:bg-slate-800/30' }}">
+                                    @php
+                                        $vmIcon = 'monitor';
+                                        if ($item['type'] == 'lxc') {
+                                            $vmIcon = 'container';
+                                        } elseif ($item['type'] == 'storage') {
+                                            $vmIcon = 'hard-drive';
+                                        } elseif ($item['type'] == 'sdn') {
+                                            $vmIcon = 'network';
+                                        }
+                                    @endphp
+                                    <i data-lucide="{{ $vmIcon }}"
+                                        class="w-3.5 h-3.5 opacity-50 group-hover:opacity-100"></i>
+                                    <span>{{ $item['name'] }}</span>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
                 </div>
-                <i data-lucide="chevron-right" class="w-4 h-4 transition-transform duration-200"
-                    :class="openSections.includes('proxmox_sekupang') ? 'rotate-90' : ''"></i>
-            </button>
-            <div x-show="openSections.includes('proxmox_sekupang')" x-collapse class="pl-11 space-y-1">
-                <a href="{{ route('proxmox.nodes', ['location' => 'sekupang']) }}"
-                    class="block py-1.5 text-sm {{ request()->routeIs('proxmox.nodes') && request('location') == 'sekupang' ? 'text-blue-400 font-bold' : 'text-slate-500 hover:text-blue-400' }}">VM</a>
             </div>
+        @endforeach
+
+        <div class="pt-6 pb-2 px-4">
+            <span class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500/80">Services</span>
         </div>
 
         <!-- Nextcloud Section -->
         <div class="space-y-1">
             <button @click="toggleSection('nextcloud')"
-                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
+                class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-white transition-all group">
                 <div class="flex items-center space-x-3">
-                    <i data-lucide="cloud" class="w-5 h-5 group-hover:text-emerald-400"></i>
-                    <span class="font-medium">Nextcloud</span>
+                    <i data-lucide="cloud" class="w-5 h-5 text-emerald-500/80 group-hover:text-emerald-400"></i>
+                    <span class="font-semibold text-[13px]">Nextcloud Hub</span>
                 </div>
-                <i data-lucide="chevron-right" class="w-4 h-4 transition-transform duration-200"
-                    :class="openSections.includes('nextcloud') ? 'rotate-90' : ''"></i>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-slate-600 transition-transform duration-300"
+                    :class="openSections.includes('nextcloud') ? 'rotate-90 text-slate-400' : ''"></i>
             </button>
-            <div x-show="openSections.includes('nextcloud')" x-collapse class="pl-11 space-y-1">
+            <div x-show="openSections.includes('nextcloud')" x-collapse
+                class="ml-6 pl-4 border-l border-slate-800/80 space-y-1 mt-1">
                 <a href="{{ route('nextcloud.overview') }}"
-                    class="block py-1.5 text-sm {{ request()->routeIs('nextcloud.overview') ? 'text-emerald-400 font-bold' : 'text-slate-500 hover:text-emerald-400' }}">Overview</a>
+                    class="block py-2 px-3 text-xs rounded-lg {{ request()->routeIs('nextcloud.overview') ? 'bg-emerald-600/10 text-emerald-400 font-bold' : 'text-slate-500 hover:text-emerald-400 hover:bg-emerald-600/5' }}">Overview</a>
                 <a href="{{ route('nextcloud.users') }}"
-                    class="block py-1.5 text-sm {{ request()->routeIs('nextcloud.users') ? 'text-emerald-400 font-bold' : 'text-slate-500 hover:text-emerald-400' }}">Users</a>
+                    class="block py-2 px-3 text-xs rounded-lg {{ request()->routeIs('nextcloud.users') ? 'bg-emerald-600/10 text-emerald-400 font-bold' : 'text-slate-500 hover:text-emerald-400 hover:bg-emerald-600/5' }}">Identity</a>
                 <a href="{{ route('nextcloud.storage') }}"
-                    class="block py-1.5 text-sm {{ request()->routeIs('nextcloud.storage') ? 'text-emerald-400 font-bold' : 'text-slate-500 hover:text-emerald-400' }}">Storage</a>
+                    class="block py-2 px-3 text-xs rounded-lg {{ request()->routeIs('nextcloud.storage') ? 'bg-emerald-600/10 text-emerald-400 font-bold' : 'text-slate-500 hover:text-emerald-400 hover:bg-emerald-600/5' }}">Filesystem</a>
             </div>
         </div>
 
-        <!-- System Section -->
+        <!-- System Settings Section -->
         <div class="space-y-1">
             <button @click="toggleSection('system')"
-                class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
+                class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-slate-400 hover:bg-slate-800/50 hover:text-white transition-all group">
                 <div class="flex items-center space-x-3">
-                    <i data-lucide="settings" class="w-5 h-5 group-hover:text-amber-400"></i>
-                    <span class="font-medium">System</span>
+                    <i data-lucide="cog" class="w-5 h-5 text-slate-500 group-hover:text-amber-400"></i>
+                    <span class="font-semibold text-[13px]">System Tuning</span>
                 </div>
-                <i data-lucide="chevron-right" class="w-4 h-4 transition-transform duration-200"
-                    :class="openSections.includes('system') ? 'rotate-90' : ''"></i>
+                <i data-lucide="chevron-right" class="w-4 h-4 text-slate-600 transition-transform duration-300"
+                    :class="openSections.includes('system') ? 'rotate-90 text-slate-400' : ''"></i>
             </button>
-            <div x-show="openSections.includes('system')" x-collapse class="pl-11 space-y-1">
+            <div x-show="openSections.includes('system')" x-collapse
+                class="ml-6 pl-4 border-l border-slate-800/80 space-y-1 mt-1">
                 <a href="{{ route('system.alerts') }}"
-                    class="block py-1.5 text-sm {{ request()->routeIs('system.alerts') ? 'text-amber-400 font-bold' : 'text-slate-500 hover:text-amber-400' }}">Alerts</a>
+                    class="block py-2 px-3 text-xs rounded-lg {{ request()->routeIs('system.alerts') ? 'bg-amber-600/10 text-amber-400 font-bold' : 'text-slate-500 hover:text-amber-400 hover:bg-amber-600/5' }}">Global
+                    Alerts</a>
                 <a href="{{ route('system.logs') }}"
-                    class="block py-1.5 text-sm {{ request()->routeIs('system.logs') ? 'text-amber-400 font-bold' : 'text-slate-500 hover:text-amber-400' }}">Logs</a>
+                    class="block py-2 px-3 text-xs rounded-lg {{ request()->routeIs('system.logs') ? 'bg-amber-600/10 text-amber-400 font-bold' : 'text-slate-500 hover:text-amber-400 hover:bg-amber-600/5' }}">Audit
+                    Logs</a>
             </div>
         </div>
     </nav>
 
-    <!-- Bottom Action -->
-    <div class="p-4 border-t border-slate-800 mt-auto">
+    <!-- Profile & Session -->
+    <div class="p-4 bg-slate-900/50 border-t border-white/5 backdrop-blur-lg mt-auto">
         <div class="flex items-center justify-between px-2">
             <div class="flex items-center space-x-3">
                 <div
-                    class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700">
-                    <i data-lucide="user" class="w-5 h-5 text-slate-400"></i>
+                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center border border-white/5 shadow-inner">
+                    <i data-lucide="shield-check" class="w-5 h-5 text-blue-500/80"></i>
                 </div>
-                <div>
-                    <div class="text-sm font-semibold text-white">{{ session('user_name', 'Guest') }}</div>
-                    <div class="text-xs text-slate-500">Logout</div>
+                <div class="flex flex-col">
+                    <span
+                        class="text-[13px] font-bold text-slate-200 truncate max-w-[100px]">{{ session('user_name', 'Admin') }}</span>
+                    <span class="text-[10px] text-slate-500 uppercase font-black tracking-wider">Superuser</span>
                 </div>
             </div>
             <form action="{{ route('logout') }}" method="POST" id="logout-form">
                 @csrf
-                <button type="submit" class="text-slate-500 hover:text-red-400 transition-colors">
-                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                <button type="submit"
+                    class="p-2.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-500/10 transition-all group">
+                    <i data-lucide="power" class="w-4 h-4 group-hover:scale-110 transition-transform"></i>
                 </button>
             </form>
         </div>

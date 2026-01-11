@@ -21,6 +21,8 @@ Route::middleware([DummyAuth::class])->group(function () {
     // Proxmox Section
     Route::get('/proxmox', [ProxmoxController::class, 'index'])->name('proxmox.index');
     Route::get('/proxmox/nodes/{location?}', [ProxmoxController::class, 'nodes'])->name('proxmox.nodes');
+    Route::get('/proxmox/datacenter/{location?}', [ProxmoxController::class, 'datacenter'])->name('proxmox.datacenter');
+    Route::get('/proxmox/vm/{location}/{vm_id}', [ProxmoxController::class, 'vmDetail'])->name('proxmox.vm_detail');
 
     // Nextcloud Section
     Route::get('/nextcloud', [NextcloudController::class, 'index'])->name('nextcloud.index');
