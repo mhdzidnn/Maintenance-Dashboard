@@ -23,7 +23,7 @@
                             {{ $user->last_login->diffForHumans() }}</p>
                     </div>
                 </div>
-                <div class="flex space-x-[1.5px]">
+                <div class="flex space-x-[1.5px]"> 
                     @for ($i = 0; $i < 4; $i++)
                         <div
                             class="w-1 h-2 rounded-full {{ $i < 4 - $loop->index ? 'bg-blue-500/60 shadow-[0_0_5px_rgba(59,130,246,0.3)]' : 'bg-slate-800' }}">
