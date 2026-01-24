@@ -6,19 +6,19 @@
         <div class="flex items-center justify-between">
             <div class="flex items-center space-x-4">
                 <div
-                    class="w-12 h-12 rounded-xl {{ $vm->status == 'running' ? 'bg-green-500/10 text-green-400' : 'bg-slate-800 text-slate-500' }} flex items-center justify-center border {{ $vm->status == 'running' ? 'border-green-500/20' : 'border-slate-700' }}">
+                    class="w-12 h-12 rounded-xl {{ $vm->status == 'running' ? 'bg-green-500/10 text-green-600' : 'bg-slate-100 text-slate-500' }} flex items-center justify-center border {{ $vm->status == 'running' ? 'border-green-500/20' : 'border-slate-200' }}">
                     <i data-lucide="{{ $vm->os_type == 'windows' ? 'monitor' : 'server' }}" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold text-white">{{ $vm->name }} ({{ $vm->id }})</h1>
-                    <p class="text-slate-400">Node: {{ $vm->node }} &bull; Status: <span
-                            class="{{ $vm->status == 'running' ? 'text-green-400' : 'text-slate-400' }} uppercase font-bold">{{ $vm->status }}</span>
+                    <h1 class="text-2xl font-bold text-slate-800">{{ $vm->name }} ({{ $vm->id }})</h1>
+                    <p class="text-slate-500">Node: {{ $vm->node }} &bull; Status: <span
+                            class="{{ $vm->status == 'running' ? 'text-green-600' : 'text-slate-500' }} uppercase font-bold">{{ $vm->status }}</span>
                     </p>
                 </div>
             </div>
             <div class="flex items-center space-x-3">
                 <a href="{{ route('proxmox.datacenter', ['location' => $location]) }}"
-                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-medium transition-colors">
+                    class="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-sm font-medium transition-colors">
                     Back to Datacenter
                 </a>
                 <button
@@ -31,54 +31,54 @@
         <!-- Stats Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Status & Configuration -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                <h2 class="text-lg font-semibold text-white mb-6 flex items-center">
-                    <i data-lucide="info" class="w-5 h-5 mr-2 text-blue-400"></i>
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                <h2 class="text-lg font-semibold text-slate-800 mb-6 flex items-center">
+                    <i data-lucide="info" class="w-5 h-5 mr-2 text-blue-500"></i>
                     Status & Configuration
                 </h2>
                 <div class="space-y-4">
-                    <div class="flex justify-between items-center py-3 border-b border-slate-800">
-                        <span class="text-slate-400">Uptime</span>
-                        <span class="text-white font-mono">{{ $vm->uptime }}</span>
+                    <div class="flex justify-between items-center py-3 border-b border-slate-100">
+                        <span class="text-slate-500">Uptime</span>
+                        <span class="text-slate-900 font-mono">{{ $vm->uptime }}</span>
                     </div>
-                    <div class="flex justify-between items-center py-3 border-b border-slate-800">
-                        <span class="text-slate-400">OS Type</span>
-                        <span class="text-white capitalize flex items-center">
+                    <div class="flex justify-between items-center py-3 border-b border-slate-100">
+                        <span class="text-slate-500">OS Type</span>
+                        <span class="text-slate-900 capitalize flex items-center">
                             <i data-lucide="{{ $vm->os_type == 'windows' ? 'monitor' : 'terminal' }}"
-                                class="w-4 h-4 mr-2 text-slate-500"></i>
+                                class="w-4 h-4 mr-2 text-slate-400"></i>
                             {{ $vm->os_type }}
                         </span>
                     </div>
-                    <div class="flex justify-between items-center py-3 border-b border-slate-800">
-                        <span class="text-slate-400">IP Address</span>
-                        <span class="text-white font-mono">{{ $vm->ip_address }}</span>
+                    <div class="flex justify-between items-center py-3 border-b border-slate-100">
+                        <span class="text-slate-500">IP Address</span>
+                        <span class="text-slate-900 font-mono">{{ $vm->ip_address }}</span>
                     </div>
-                    <div class="flex justify-between items-center py-3 border-b border-slate-800">
-                        <span class="text-slate-400">Boot Order</span>
-                        <span class="text-white">scsi0; ide2; net0</span>
+                    <div class="flex justify-between items-center py-3 border-b border-slate-100">
+                        <span class="text-slate-500">Boot Order</span>
+                        <span class="text-slate-900">scsi0; ide2; net0</span>
                     </div>
                     <div class="flex justify-between items-center py-3">
-                        <span class="text-slate-400">HA State</span>
-                        <span class="text-green-400">None</span>
+                        <span class="text-slate-500">HA State</span>
+                        <span class="text-green-600">None</span>
                     </div>
                 </div>
             </div>
 
             <!-- Resource Usage -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                <h2 class="text-lg font-semibold text-white mb-6 flex items-center">
-                    <i data-lucide="activity" class="w-5 h-5 mr-2 text-purple-400"></i>
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                <h2 class="text-lg font-semibold text-slate-800 mb-6 flex items-center">
+                    <i data-lucide="activity" class="w-5 h-5 mr-2 text-purple-500"></i>
                     Resource Summary
                 </h2>
                 <div class="space-y-6">
                     <!-- CPU -->
                     <div>
                         <div class="flex justify-between mb-2">
-                            <span class="text-slate-400 text-sm">CPU Usage</span>
-                            <span class="text-white text-sm font-bold">{{ $vm->cpu_usage }}% of {{ $vm->cpu_cores }}
+                            <span class="text-slate-500 text-sm">CPU Usage</span>
+                            <span class="text-slate-800 text-sm font-bold">{{ $vm->cpu_usage }}% of {{ $vm->cpu_cores }}
                                 CPU(s)</span>
                         </div>
-                        <div class="w-full bg-slate-800 rounded-full h-2.5">
+                        <div class="w-full bg-slate-100 rounded-full h-2.5">
                             <div class="bg-blue-500 h-2.5 rounded-full" style="width: {{ $vm->cpu_usage }}%"></div>
                         </div>
                     </div>
@@ -86,11 +86,11 @@
                     <!-- Memory -->
                     <div>
                         <div class="flex justify-between mb-2">
-                            <span class="text-slate-400 text-sm">Memory Usage</span>
-                            <span class="text-white text-sm font-bold">{{ $vm->memory_usage_percent }}%
+                            <span class="text-slate-500 text-sm">Memory Usage</span>
+                            <span class="text-slate-800 text-sm font-bold">{{ $vm->memory_usage_percent }}%
                                 ({{ $vm->memory_usage_gb }}GiB of {{ $vm->memory_total_gb }}GiB)</span>
                         </div>
-                        <div class="w-full bg-slate-800 rounded-full h-2.5">
+                        <div class="w-full bg-slate-100 rounded-full h-2.5">
                             <div class="bg-purple-500 h-2.5 rounded-full" style="width: {{ $vm->memory_usage_percent }}%">
                             </div>
                         </div>
@@ -99,10 +99,10 @@
                     <!-- Disk -->
                     <div>
                         <div class="flex justify-between mb-2">
-                            <span class="text-slate-400 text-sm">Bootdisk Size</span>
-                            <span class="text-white text-sm font-bold">{{ $vm->disk_total_gb }}GB</span>
+                            <span class="text-slate-500 text-sm">Bootdisk Size</span>
+                            <span class="text-slate-800 text-sm font-bold">{{ $vm->disk_total_gb }}GB</span>
                         </div>
-                        <div class="w-full bg-slate-800 rounded-full h-2.5">
+                        <div class="w-full bg-slate-100 rounded-full h-2.5">
                             @php $diskPercent = ($vm->disk_usage_gb / $vm->disk_total_gb) * 100; @endphp
                             <div class="bg-amber-500 h-2.5 rounded-full" style="width: {{ $diskPercent }}%"></div>
                         </div>
@@ -114,36 +114,36 @@
         <!-- Performance Graphs Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- CPU Usage Graph -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                <h2 class="text-lg font-semibold text-white mb-4 flex items-center">
-                    <i data-lucide="cpu" class="w-5 h-5 mr-2 text-blue-400"></i>
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                <h2 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+                    <i data-lucide="cpu" class="w-5 h-5 mr-2 text-blue-500"></i>
                     CPU Usage
                 </h2>
                 <div id="cpuChart" class="-ml-2"></div>
             </div>
 
             <!-- Memory Usage Graph -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                <h2 class="text-lg font-semibold text-white mb-4 flex items-center">
-                    <i data-lucide="memory-stick" class="w-5 h-5 mr-2 text-purple-400"></i>
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                <h2 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+                    <i data-lucide="memory-stick" class="w-5 h-5 mr-2 text-purple-500"></i>
                     Memory Usage
                 </h2>
                 <div id="memoryChart" class="-ml-2"></div>
             </div>
 
             <!-- Network Traffic Graph -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                <h2 class="text-lg font-semibold text-white mb-4 flex items-center">
-                    <i data-lucide="network" class="w-5 h-5 mr-2 text-emerald-400"></i>
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                <h2 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+                    <i data-lucide="network" class="w-5 h-5 mr-2 text-emerald-500"></i>
                     Network Traffic (net0)
                 </h2>
                 <div id="networkChart" class="-ml-2"></div>
             </div>
 
             <!-- Disk IO Graph -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
-                <h2 class="text-lg font-semibold text-white mb-4 flex items-center">
-                    <i data-lucide="hard-drive" class="w-5 h-5 mr-2 text-amber-400"></i>
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                <h2 class="text-lg font-semibold text-slate-800 mb-4 flex items-center">
+                    <i data-lucide="hard-drive" class="w-5 h-5 mr-2 text-amber-500"></i>
                     Disk IO
                 </h2>
                 <div id="diskChart" class="-ml-2"></div>
@@ -233,7 +233,7 @@
                     }
                 },
                 theme: {
-                    mode: 'dark'
+                    mode: 'light'
                 },
                 tooltip: {
                     theme: 'dark',

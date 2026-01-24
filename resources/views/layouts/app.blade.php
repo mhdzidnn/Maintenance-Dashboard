@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
     <meta charset="utf-8">
@@ -16,18 +16,21 @@
     <!-- Styles / Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
+    <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #020617;
-            color: #f8fafc;
+            background-color: #f1f5f9;
+            /* Slate-100 */
+            color: #0f172a;
+            /* Slate-900 */
         }
 
         .glass {
-            background: rgba(30, 41, 59, 0.7);
+            background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
         .scrollbar-hide::-webkit-scrollbar {
@@ -42,13 +45,7 @@
 </head>
 
 <body class="antialiased scrollbar-hide">
-    <!-- Development Ribbon -->
-    <div class="fixed top-0 right-0 z-[9999] pointer-events-none overflow-hidden w-40 h-40">
-        <div
-            class="absolute top-8 -right-14 bg-amber-500 text-slate-900 font-black text-[10px] py-1.5 w-[200px] text-center transform rotate-45 shadow-2xl border-y border-white/10 uppercase tracking-[0.2em] whitespace-nowrap">
-            Development UI
-        </div>
-    </div>
+
 
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar -->

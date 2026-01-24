@@ -33,5 +33,11 @@ Route::middleware([DummyAuth::class])->group(function () {
     // System Section
     Route::get('/system', [SystemController::class, 'index'])->name('system.index');
     Route::get('/system/alerts', [SystemController::class, 'alerts'])->name('system.alerts');
+    Route::get('/system/alerts', [SystemController::class, 'alerts'])->name('system.alerts');
     Route::get('/system/logs', [SystemController::class, 'logs'])->name('system.logs');
+
+    // Credential Management
+    Route::get('/credentials/{ip}', function ($ip) {
+        return view('credentials.index', ['ip' => $ip]);
+    })->name('credentials.index');
 });

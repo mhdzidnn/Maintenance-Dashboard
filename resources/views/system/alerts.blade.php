@@ -1,1 +1,6 @@
-<x-app-layout><div class='p-8'><h1 class='text-2xl font-bold text-white uppercase tracking-widest'>system/alerts.blade.php</h1><p class='text-slate-500 mt-2'>This page is under development to match the design reference image.</p></div></x-app-layout>
+<x-app-layout>
+    <div class='p-8'>
+        <h1 class='text-2xl font-bold text-slate-800 uppercase tracking-widest'>system/alerts.blade.php</h1>
+        <p class='text-slate-500 mt-2'>This page is under development to match the design reference image.</p>
+    </div>
+</x-app-layout>
