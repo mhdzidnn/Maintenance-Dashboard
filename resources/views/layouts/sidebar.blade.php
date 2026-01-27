@@ -28,7 +28,7 @@
     </div>
 
     <!-- Navigation Section -->
-    <nav class="flex-1 px-3 space-y-1.5 mt-6 overflow-y-auto scrollbar-hide">
+    <nav class="flex-1 px-3 space-y-1.5 mt-6 overflow-y-auto scrollbar-thin-white">
         <!-- Dashboard Link -->
         <a href="{{ route('dashboard') }}"
             class="group relative flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 {{ request()->routeIs('dashboard') ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/20' : 'text-blue-100 hover:bg-white/10 hover:text-white' }}">
