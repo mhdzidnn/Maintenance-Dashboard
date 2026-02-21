@@ -18,6 +18,30 @@
 
             <!-- Content Card -->
             <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                <!-- DataTable Controls -->
+                <div
+                    class="px-6 py-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm text-slate-500">Show</span>
+                        <select x-model="perPage" @change="currentPage = 1"
+                            class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all">
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                        </select>
+                        <span class="text-sm text-slate-500">entries</span>
+                    </div>
+                    <div class="relative max-w-sm w-full">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+                        </div>
+                        <input type="text" x-model="search" @input="currentPage = 1"
+                            class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400"
+                            placeholder="Search name, username, email...">
+                    </div>
+                </div>
+
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
@@ -36,7 +60,7 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
-                            <template x-for="cred in credentials" :key="cred.id">
+                            <template x-for="cred in paginatedCredentials" :key="cred.id">
                                 <tr class="hover:bg-slate-50 transition-colors group">
                                     <td class="px-6 py-4">
                                         <div class="flex items-center space-x-3">
@@ -83,18 +107,64 @@
                                     </td>
                                 </tr>
                             </template>
-                            <tr x-show="credentials.length === 0">
+                            <tr x-show="filteredCredentials.length === 0">
                                 <td colspan="5" class="px-6 py-12 text-center text-slate-500">
                                     <div class="flex flex-col items-center justify-center space-y-2">
                                         <div class="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center">
                                             <i data-lucide="shield-alert" class="w-6 h-6 text-slate-300"></i>
                                         </div>
-                                        <p>No credentials found for this server.</p>
+                                        <p>No matching credentials found.</p>
                                     </div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- Footer Pagination -->
+                <div
+                    class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div class="text-sm text-slate-500">
+                        Showing <span class="font-semibold text-slate-700" x-text="showingStart"></span> to
+                        <span class="font-semibold text-slate-700" x-text="showingEnd"></span> of
+                        <span class="font-semibold text-slate-700" x-text="filteredCredentials.length"></span> entries
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <button @click="currentPage = 1" :disabled="currentPage === 1"
+                            class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                            :class="currentPage === 1 ? 'text-slate-400 cursor-not-allowed' :
+                                'text-slate-600 hover:bg-white hover:shadow-sm'">
+                            First
+                        </button>
+                        <button @click="currentPage--" :disabled="currentPage === 1"
+                            class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                            :class="currentPage === 1 ? 'text-slate-400 cursor-not-allowed' :
+                                'text-slate-600 hover:bg-white hover:shadow-sm'">
+                            Previous
+                        </button>
+
+                        <template x-for="page in totalPages" :key="page">
+                            <button @click="currentPage = page"
+                                class="w-8 h-8 rounded-lg text-xs font-semibold transition-all"
+                                :class="currentPage === page ? 'bg-blue-600 text-white shadow-sm' :
+                                    'text-slate-600 hover:bg-white hover:shadow-sm'"
+                                x-text="page">
+                            </button>
+                        </template>
+
+                        <button @click="currentPage++" :disabled="currentPage === totalPages"
+                            class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                            :class="currentPage === totalPages ? 'text-slate-400 cursor-not-allowed' :
+                                'text-slate-600 hover:bg-white hover:shadow-sm'">
+                            Next
+                        </button>
+                        <button @click="currentPage = totalPages" :disabled="currentPage === totalPages"
+                            class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                            :class="currentPage === totalPages ? 'text-slate-400 cursor-not-allowed' :
+                                'text-slate-600 hover:bg-white hover:shadow-sm'">
+                            Last
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -257,6 +327,9 @@
             Alpine.data('credentialManager', (ip) => ({
                 ip: ip,
                 credentials: [],
+                search: '',
+                perPage: 10,
+                currentPage: 1,
                 isModalOpen: false,
                 isEditing: false,
                 isDeleteModalOpen: false,
@@ -297,12 +370,75 @@
                             email: 'jane@persero.com',
                             password: 'password123'
                         },
+                        {
+                            id: 4,
+                            name: 'Michael Jordan',
+                            username: 'mj23',
+                            email: 'mj@persero.com',
+                            password: 'goat_password'
+                        },
+                        {
+                            id: 5,
+                            name: 'Cristiano Ronaldo',
+                            username: 'cr7',
+                            email: 'cr7@persero.com',
+                            password: 'siuuu_password'
+                        },
+                        {
+                            id: 6,
+                            name: 'Lionel Messi',
+                            username: 'messi10',
+                            email: 'messi@persero.com',
+                            password: 'lapulga_password'
+                        },
+                        {
+                            id: 7,
+                            name: 'Steve Jobs',
+                            username: 'steve',
+                            email: 'steve@apple.com',
+                            password: 'think_different'
+                        },
+                        {
+                            id: 8,
+                            name: 'Bill Gates',
+                            username: 'bill',
+                            email: 'bill@microsoft.com',
+                            password: 'windows_password'
+                        },
+                        {
+                            id: 9,
+                            name: 'Elon Musk',
+                            username: 'elon',
+                            email: 'elon@tesla.com',
+                            password: 'mars_password'
+                        },
+                        {
+                            id: 10,
+                            name: 'Jeff Bezos',
+                            username: 'jeff',
+                            email: 'jeff@amazon.com',
+                            password: 'prime_password'
+                        },
+                        {
+                            id: 11,
+                            name: 'Mark Zuckerberg',
+                            username: 'mark',
+                            email: 'mark@meta.com',
+                            password: 'meta_password'
+                        },
+                        {
+                            id: 12,
+                            name: 'Larry Page',
+                            username: 'larry',
+                            email: 'larry@google.com',
+                            password: 'search_password'
+                        }
                     ];
 
                     if (this.ip.endsWith('53')) {
-                        this.credentials = dummyData.slice(0, 2);
+                        this.credentials = dummyData.slice(0, 5);
                     } else if (this.ip.endsWith('54')) {
-                        this.credentials = [dummyData[0], dummyData[2]];
+                        this.credentials = dummyData.slice(5, 12);
                     } else {
                         this.credentials = dummyData;
                     }
@@ -310,6 +446,36 @@
                     this.$nextTick(() => {
                         lucide.createIcons();
                     });
+                },
+
+                get filteredCredentials() {
+                    const searchTerm = this.search.toLowerCase();
+                    return this.credentials.filter(c =>
+                        c.name.toLowerCase().includes(searchTerm) ||
+                        c.username.toLowerCase().includes(searchTerm) ||
+                        c.email.toLowerCase().includes(searchTerm)
+                    );
+                },
+
+                get paginatedCredentials() {
+                    const start = (this.currentPage - 1) * this.perPage;
+                    const end = start + parseInt(this.perPage);
+                    return this.filteredCredentials.slice(start, end);
+                },
+
+                get totalPages() {
+                    return Math.ceil(this.filteredCredentials.length / this.perPage);
+                },
+
+                get showingStart() {
+                    if (this.filteredCredentials.length === 0) return 0;
+                    return (this.currentPage - 1) * this.perPage + 1;
+                },
+
+                get showingEnd() {
+                    const end = this.currentPage * this.perPage;
+                    return end > this.filteredCredentials.length ? this.filteredCredentials.length :
+                        end;
                 },
 
                 showToast(message, type = 'success') {
@@ -332,6 +498,7 @@
                     this.isModalOpen = true;
                     this.isEditing = false;
                     this.resetForm();
+                    this.$nextTick(() => lucide.createIcons());
                 },
 
                 closeModal() {
@@ -355,6 +522,7 @@
                         ...cred
                     };
                     this.isModalOpen = true;
+                    this.$nextTick(() => lucide.createIcons());
                 },
 
                 save() {
@@ -405,6 +573,11 @@
                     this.isDeleteModalOpen = false;
                     this.deleteTarget = null;
                     this.showToast(`Data "${name}" berhasil dihapus.`, 'danger');
+
+                    // Adjust page if current page becomes empty
+                    if (this.paginatedCredentials.length === 0 && this.currentPage > 1) {
+                        this.currentPage--;
+                    }
                 },
             }))
         });

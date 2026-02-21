@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MasterDataController;
 use App\Http\Controllers\NextcloudController;
 use App\Http\Controllers\ProxmoxController;
 use App\Http\Controllers\SystemController;
@@ -40,4 +41,8 @@ Route::middleware([DummyAuth::class])->group(function () {
     Route::get('/credentials/{ip}', function ($ip) {
         return view('credentials.index', ['ip' => $ip]);
     })->name('credentials.index');
+
+    // Master Data
+    Route::get('/master-data/lokasi-proxmox', [MasterDataController::class, 'lokasiProxmox'])->name('master-data.lokasi-proxmox');
+    Route::get('/master-data/threshold-alert', [MasterDataController::class, 'thresholdAlert'])->name('master-data.threshold-alert');
 });

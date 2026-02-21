@@ -85,9 +85,8 @@
                     <a href="{{ route('proxmox.datacenter', ['location' => $loc['id']]) }}"
                         class="group flex items-center justify-between px-3 py-2.5 rounded-xl transition-all {{ request()->fullUrlIs(route('proxmox.datacenter', ['location' => $loc['id']])) ? 'bg-blue-500/20 text-white font-bold shadow-inner border border-blue-500/30' : 'text-blue-200 hover:bg-white/5 hover:text-white' }}">
                         <div class="flex items-center space-x-3">
-                            <div
-                                class="w-1.5 h-1.5 rounded-full {{ request()->fullUrlIs(route('proxmox.datacenter', ['location' => $loc['id']])) ? 'bg-amber-400 shadow-[0_0_5px_rgba(251,191,36,0.5)]' : 'bg-blue-400/30 group-hover:bg-blue-300' }} transition-colors">
-                            </div>
+                            <i data-lucide="layout-dashboard"
+                                class="w-3.5 h-3.5 {{ request()->fullUrlIs(route('proxmox.datacenter', ['location' => $loc['id']])) ? 'text-amber-400' : 'text-blue-400/60 group-hover:text-blue-300' }} transition-colors"></i>
                             <span class="text-xs tracking-wide">Datacenter Summary</span>
                         </div>
                     </a>
@@ -98,10 +97,9 @@
                             class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-blue-200 hover:text-white hover:bg-white/5 transition-all group text-xs font-medium"
                             :class="openSections.includes('proxmox_{{ $loc['id'] }}_pve') ? 'bg-white/5 text-white' : ''">
                             <div class="flex items-center space-x-3">
-                                <div class="w-1.5 h-1.5 rounded-full bg-blue-400/30 group-hover:bg-blue-300 transition-colors"
-                                    :class="openSections.includes('proxmox_{{ $loc['id'] }}_pve') ?
-                                        'bg-blue-400 shadow-[0_0_5px_rgba(96,165,250,0.5)]' : ''">
-                                </div>
+                                <i data-lucide="server" class="w-3.5 h-3.5 transition-colors"
+                                    :class="openSections.includes('proxmox_{{ $loc['id'] }}_pve') ? 'text-cyan-400' :
+                                        'text-blue-400/60 group-hover:text-blue-300'"></i>
                                 <span class="font-semibold tracking-wide">Node: pve</span>
                             </div>
                             <i data-lucide="chevron-down" class="w-3.5 h-3.5 transition-transform duration-300"
@@ -112,20 +110,27 @@
                             class="ml-4 pl-3 border-l border-white/10 space-y-1 mt-1">
                             @foreach ($pveItems as $item)
                                 <a href="{{ route('proxmox.vm_detail', ['location' => $loc['id'], 'vm_id' => $item['id']]) }}"
-                                    class="group flex items-center space-x-3 py-2 px-3 text-[11px] rounded-lg transition-all {{ request()->routeIs('proxmox.vm_detail') && request('vm_id') == $item['id'] && request('location') == $loc['id'] ? 'bg-white/10 text-white font-bold ring-1 ring-white/20' : 'text-blue-300/70 hover:text-white hover:bg-white/5' }}">
+                                    class="group flex items-center space-x-2.5 py-2 px-3 text-[11px] rounded-lg transition-all {{ request()->routeIs('proxmox.vm_detail') && request('vm_id') == $item['id'] && request('location') == $loc['id'] ? 'bg-white/10 text-white font-bold ring-1 ring-white/20' : 'text-blue-300/70 hover:text-white hover:bg-white/5' }}">
                                     @php
                                         $vmIcon = 'monitor';
-                                        if ($item['type'] == 'lxc') {
-                                            $vmIcon = 'container';
-                                        } elseif ($item['type'] == 'storage') {
+                                        $vmColor = 'text-blue-300';
+                                        if ($item['type'] === 'lxc') {
+                                            $vmIcon = 'layers';
+                                            $vmColor = 'text-emerald-400';
+                                        } elseif ($item['type'] === 'storage') {
                                             $vmIcon = 'hard-drive';
-                                        } elseif ($item['type'] == 'sdn') {
-                                            $vmIcon = 'network';
+                                            $vmColor = 'text-amber-400';
+                                        } elseif ($item['type'] === 'sdn') {
+                                            $vmIcon = 'share-2';
+                                            $vmColor = 'text-violet-400';
+                                        } elseif ($item['type'] === 'node') {
+                                            $vmIcon = 'server';
+                                            $vmColor = 'text-cyan-400';
                                         }
                                     @endphp
                                     <i data-lucide="{{ $vmIcon }}"
-                                        class="w-3.5 h-3.5 {{ request()->routeIs('proxmox.vm_detail') && request('vm_id') == $item['id'] && request('location') == $loc['id'] ? 'text-amber-400' : 'opacity-50 group-hover:opacity-100 group-hover:text-blue-300' }}"></i>
-                                    <span class="tracking-wide">{{ $item['name'] }}</span>
+                                        class="w-3.5 h-3.5 flex-shrink-0 {{ request()->routeIs('proxmox.vm_detail') && request('vm_id') == $item['id'] && request('location') == $loc['id'] ? 'text-amber-400' : $vmColor . ' opacity-70 group-hover:opacity-100' }} transition-all"></i>
+                                    <span class="tracking-wide truncate">{{ $item['name'] }}</span>
                                 </a>
                             @endforeach
                         </div>
@@ -155,6 +160,37 @@
             </a>
         @endforeach
 
+        {{-- Master Data Section --}}
+        <div class="pt-6 pb-2 px-4">
+            <span class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-300/60">Master Data</span>
+        </div>
+
+        @php
+            $masterMenus = [
+                [
+                    'label' => 'Lokasi Proxmox',
+                    'route' => 'master-data.lokasi-proxmox',
+                    'icon' => 'map-pin',
+                    'color' => 'text-emerald-400',
+                    'match' => 'master-data/lokasi-proxmox',
+                ],
+                [
+                    'label' => 'Threshold Alert',
+                    'route' => 'master-data.threshold-alert',
+                    'icon' => 'bell',
+                    'color' => 'text-amber-400',
+                    'match' => 'master-data/threshold-alert',
+                ],
+            ];
+        @endphp
+        @foreach ($masterMenus as $menu)
+            <a href="{{ route($menu['route']) }}"
+                class="group flex items-center space-x-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->is($menu['match']) ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/20' : 'text-blue-100 hover:bg-white/10 hover:text-white' }}">
+                <i data-lucide="{{ $menu['icon'] }}"
+                    class="w-5 h-5 {{ request()->is($menu['match']) ? 'text-white' : $menu['color'] }} transition-colors"></i>
+                <span class="font-semibold text-[13px]">{{ $menu['label'] }}</span>
+            </a>
+        @endforeach
 
     </nav>
 
