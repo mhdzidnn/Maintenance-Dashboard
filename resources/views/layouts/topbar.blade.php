@@ -7,28 +7,5 @@
         <h2 class="text-lg font-bold text-slate-800 tracking-tight">Maintenance Dashboard</h2>
     </div>
 
-    <!-- Right Section (Actions/User) -->
-    <div class="flex items-center space-x-6">
-        <!-- Icons -->
-        <div class="flex items-center space-x-4">
-            <button class="text-slate-400 hover:text-blue-600 transition-colors relative">
-                <i data-lucide="mail" class="w-5 h-5"></i>
-            </button>
-            <button class="text-slate-400 hover:text-blue-600 transition-colors relative group">
-                <i data-lucide="bell" class="w-5 h-5"></i>
-                <span
-                    class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white animate-pulse"></span>
-            </button>
-        </div>
 
-        <!-- Divider -->
-        <div class="h-6 w-px bg-slate-200"></div>
-
-        <!-- User Info -->
-        <div class="flex items-center space-x-2 text-sm font-bold">
-            <span class="text-slate-500">Admin</span>
-            <span class="text-slate-300">|</span>
-            <button class="text-slate-500 hover:text-red-500 transition-colors">Logout</button>
-        </div>
-    </div>
 </header>

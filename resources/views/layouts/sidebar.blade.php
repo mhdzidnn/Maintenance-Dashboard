@@ -139,12 +139,19 @@
                 VM</span>
         </div>
 
+        @php
+            $credColors = [
+                '10.13.15.52' => 'text-emerald-400',
+                '10.13.15.53' => 'text-violet-400',
+                '10.13.15.54' => 'text-amber-400',
+            ];
+        @endphp
         @foreach (['10.13.15.52', '10.13.15.53', '10.13.15.54'] as $ip)
             <a href="{{ route('credentials.index', ['ip' => $ip]) }}"
-                class="group flex items-center space-x-3 px-4 py-3 mx-3 mb-1 rounded-xl transition-all duration-200 {{ request()->is('credentials/' . $ip) ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/20' : 'text-blue-100 hover:bg-white/10 hover:text-white' }}">
-                <i data-lucide="lock"
-                    class="w-5 h-5 {{ request()->is('credentials/' . $ip) ? 'text-amber-400' : 'text-blue-300 group-hover:text-white' }} transition-colors"></i>
-                <span class="font-semibold text-sm">Server {{ $ip }}</span>
+                class="group flex items-center space-x-3 px-4 py-2.5 rounded-xl transition-all duration-200 {{ request()->is('credentials/' . $ip) ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/20' : 'text-blue-100 hover:bg-white/10 hover:text-white' }}">
+                <i data-lucide="server"
+                    class="w-5 h-5 {{ request()->is('credentials/' . $ip) ? 'text-white' : $credColors[$ip] . ' group-hover:brightness-125' }} transition-colors"></i>
+                <span class="font-semibold text-[13px]">Server {{ $ip }}</span>
             </a>
         @endforeach
 
