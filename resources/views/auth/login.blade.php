@@ -56,11 +56,6 @@
             <!-- Content -->
             <div class="relative z-10 flex flex-col h-full justify-center space-y-10 max-w-md mx-auto">
                 <div class="space-y-3">
-                    <div class="inline-flex items-center px-3 py-1.5 rounded-full glass-element mb-2">
-                        <span class="w-2 h-2 rounded-full bg-amber-400 mr-2 animate-pulse"></span>
-                        <span class="text-[10px] font-bold uppercase tracking-widest text-blue-100">Enterprise System
-                            V2.0</span>
-                    </div>
                     <h1 class="text-4xl font-black tracking-tight leading-tight">
                         Powering Your <br />
                         <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-white">IT

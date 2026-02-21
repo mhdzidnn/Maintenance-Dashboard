@@ -13,12 +13,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+
         $this->call([
-            NodeSeeder::class,
-            StorageHealthSeeder::class,
-            VirtualMachineSeeder::class,
-            NextcloudSeeder::class,
-            SystemAlertSeeder::class,
+            // Local seeders (commented out to prioritize new Proxmox structure)
+            // NodeSeeder::class,
+            // StorageHealthSeeder::class,
+            // VirtualMachineSeeder::class,
+            // NextcloudSeeder::class,
+            // SystemAlertSeeder::class,
+            
+            // New Seeders for Database Integration
+            ProxmoxSeeder::class,
+            CredentialSeeder::class,
         ]);
+
     }
 }
