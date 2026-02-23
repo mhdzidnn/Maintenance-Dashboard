@@ -197,45 +197,14 @@
                     type: 'success',
                     timer: null
                 },
-                data: [{
-                        id: 1,
-                        nama: 'AGS',
-                        key: 'ags',
-                        ip: '10.13.15.10',
-                        deskripsi: 'Kantor cabang AGS, berisi VM operasional utama'
-                    },
-                    {
-                        id: 2,
-                        nama: 'Kantor Pusat',
-                        key: 'pusat',
-                        ip: '10.13.15.20',
-                        deskripsi: 'Server pusat dengan beban tinggi, 4 VM aktif'
-                    },
-                    {
-                        id: 3,
-                        nama: 'Punggur',
-                        key: 'punggur',
-                        ip: '10.13.15.30',
-                        deskripsi: 'Site Punggur, sebagian VM sedang tidak aktif'
-                    },
-                    {
-                        id: 4,
-                        nama: 'Sekupang',
-                        key: 'sekupang',
-                        ip: '10.13.15.40',
-                        deskripsi: 'Site Sekupang, kondisi normal dan seimbang'
-                    },
-                ],
-                showToast(message, type = 'success') {
-                    clearTimeout(this.toast.timer);
-                    this.toast = {
-                        show: true,
-                        message,
-                        type,
-                        timer: null
-                    };
+                data: [],
+                init() {
+                    this.fetchData();
+                },
+                async fetchData() {
+                    const res = await fetch('/api/master-data/lokasi');
+                    this.data = await res.json();
                     this.$nextTick(() => lucide.createIcons());
-                    this.toast.timer = setTimeout(() => this.toast.show = false, 4000);
                 },
                 openModal() {
                     this.isModalOpen = true;
@@ -254,30 +223,47 @@
                 edit(item) {
                     this.isEditing = true;
                     this.form = {
-                        ...item
+                        id: item.id,
+                        nama: item.name,
+                        key: item.key,
+                        ip: item.ip_node,
+                        deskripsi: item.description
                     };
                     this.isModalOpen = true;
                 },
-                save() {
+                async save() {
                     if (!this.form.nama || !this.form.key) return;
-                    if (this.isEditing) {
-                        const i = this.data.findIndex(d => d.id === this.form.id);
-                        if (i !== -1) this.data[i] = {
-                            ...this.form
-                        };
-                        this.closeModal();
-                        this.showToast(`Lokasi "${this.form.nama}" berhasil diupdate.`);
-                    } else {
-                        const newId = Math.max(...this.data.map(d => d.id), 0) + 1;
-                        const saved = this.form.nama;
-                        this.data.push({
-                            ...this.form,
-                            id: newId
+
+                    try {
+                        const res = await fetch('/api/master-data/lokasi', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector(
+                                    'meta[name="csrf-token"]').getAttribute('content')
+                            },
+                            body: JSON.stringify({
+                                id: this.form.id,
+                                name: this.form.nama,
+                                key: this.form.key,
+                                ip_node: this.form.ip,
+                                description: this.form.deskripsi
+                            })
                         });
-                        this.closeModal();
-                        this.showToast(`Lokasi "${saved}" berhasil ditambahkan.`);
+
+                        if (res.ok) {
+                            await this.fetchData();
+                            this.closeModal();
+                            this.showToast(this.isEditing ?
+                                `Lokasi "${this.form.nama}" berhasil diupdate.` :
+                                `Lokasi "${this.form.nama}" berhasil ditambahkan.`);
+                        } else {
+                            const errorData = await res.json();
+                            this.showToast(errorData.message || 'Gagal menyimpan data.', 'danger');
+                        }
+                    } catch (e) {
+                        this.showToast('Terjadi kesalahan jaringan atau server.', 'danger');
                     }
-                    this.$nextTick(() => lucide.createIcons());
                 },
                 confirmDelete(item) {
                     this.deleteTarget = item;
@@ -288,13 +274,41 @@
                     this.deleteTarget = null;
                     this.isDeleteModalOpen = false;
                 },
-                executeDelete() {
-                    const name = this.deleteTarget.nama;
-                    this.data = this.data.filter(d => d.id !== this.deleteTarget.id);
-                    this.isDeleteModalOpen = false;
-                    this.deleteTarget = null;
-                    this.showToast(`Lokasi "${name}" berhasil dihapus.`, 'danger');
+                async executeDelete() {
+                    try {
+                        const res = await fetch(`/api/master-data/lokasi/${this.deleteTarget.id}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector(
+                                    'meta[name="csrf-token"]').getAttribute('content')
+                            }
+                        });
+
+                        if (res.ok) {
+                            const name = this.deleteTarget.name;
+                            await this.fetchData();
+                            this.isDeleteModalOpen = false;
+                            this.deleteTarget = null;
+                            this.showToast(`Lokasi "${name}" berhasil dihapus.`, 'danger');
+                        } else {
+                            const errorData = await res.json();
+                            this.showToast(errorData.message || 'Gagal menghapus data.', 'danger');
+                        }
+                    } catch (e) {
+                        this.showToast('Terjadi kesalahan jaringan atau server.', 'danger');
+                    }
                 },
+                showToast(message, type = 'success') {
+                    clearTimeout(this.toast.timer);
+                    this.toast = {
+                        show: true,
+                        message,
+                        type,
+                        timer: null
+                    };
+                    this.toast.timer = setTimeout(() => this.toast.show = false, 3000);
+                    this.$nextTick(() => lucide.createIcons());
+                }
             }));
         });
     </script>

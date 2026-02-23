@@ -109,8 +109,16 @@
                         <div x-show="openSections.includes('proxmox_{{ $loc['id'] }}_pve')" x-collapse
                             class="ml-4 pl-3 border-l border-white/10 space-y-1 mt-1">
                             @foreach ($pveItems as $item)
-                                <a href="{{ route('proxmox.vm_detail', ['location' => $loc['id'], 'vm_id' => $item['id']]) }}"
-                                    class="group flex items-center space-x-2.5 py-2 px-3 text-[11px] rounded-lg transition-all {{ request()->routeIs('proxmox.vm_detail') && request('vm_id') == $item['id'] && request('location') == $loc['id'] ? 'bg-white/10 text-white font-bold ring-1 ring-white/20' : 'text-blue-300/70 hover:text-white hover:bg-white/5' }}">
+                                @php
+                                    $route = 'proxmox.vm_detail';
+                                    if ($item['type'] === 'storage') {
+                                        $route = 'proxmox.storage_detail';
+                                    } elseif ($item['type'] === 'sdn') {
+                                        $route = 'proxmox.network_detail';
+                                    }
+                                @endphp
+                                <a href="{{ route($route, ['location' => $loc['id'], 'id' => $item['id'], 'vm_id' => $item['id']]) }}"
+                                    class="group flex items-center space-x-2.5 py-2 px-3 text-[11px] rounded-lg transition-all {{ (request()->routeIs('proxmox.vm_detail') || request()->routeIs('proxmox.storage_detail') || request()->routeIs('proxmox.network_detail')) && (request('vm_id') == $item['id'] || request('id') == $item['id']) && request('location') == $loc['id'] ? 'bg-white/10 text-white font-bold ring-1 ring-white/20' : 'text-blue-300/70 hover:text-white hover:bg-white/5' }}">
                                     @php
                                         $vmIcon = 'monitor';
                                         $vmColor = 'text-blue-300';
@@ -177,7 +185,7 @@
                 [
                     'label' => 'Threshold Alert',
                     'route' => 'master-data.threshold-alert',
-                    'icon' => 'bell',
+                    'i  con' => 'bell',
                     'color' => 'text-amber-400',
                     'match' => 'master-data/threshold-alert',
                 ],

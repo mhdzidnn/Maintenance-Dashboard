@@ -349,111 +349,21 @@
                 },
 
                 init() {
-                    const dummyData = [{
-                            id: 1,
-                            name: 'Admin System',
-                            username: 'admin_sys',
-                            email: 'admin@persero.com',
-                            password: 'password123'
-                        },
-                        {
-                            id: 2,
-                            name: 'John Doe',
-                            username: 'johndoe',
-                            email: 'john@persero.com',
-                            password: 'password123'
-                        },
-                        {
-                            id: 3,
-                            name: 'Jane Smith',
-                            username: 'janesmith',
-                            email: 'jane@persero.com',
-                            password: 'password123'
-                        },
-                        {
-                            id: 4,
-                            name: 'Michael Jordan',
-                            username: 'mj23',
-                            email: 'mj@persero.com',
-                            password: 'goat_password'
-                        },
-                        {
-                            id: 5,
-                            name: 'Cristiano Ronaldo',
-                            username: 'cr7',
-                            email: 'cr7@persero.com',
-                            password: 'siuuu_password'
-                        },
-                        {
-                            id: 6,
-                            name: 'Lionel Messi',
-                            username: 'messi10',
-                            email: 'messi@persero.com',
-                            password: 'lapulga_password'
-                        },
-                        {
-                            id: 7,
-                            name: 'Steve Jobs',
-                            username: 'steve',
-                            email: 'steve@apple.com',
-                            password: 'think_different'
-                        },
-                        {
-                            id: 8,
-                            name: 'Bill Gates',
-                            username: 'bill',
-                            email: 'bill@microsoft.com',
-                            password: 'windows_password'
-                        },
-                        {
-                            id: 9,
-                            name: 'Elon Musk',
-                            username: 'elon',
-                            email: 'elon@tesla.com',
-                            password: 'mars_password'
-                        },
-                        {
-                            id: 10,
-                            name: 'Jeff Bezos',
-                            username: 'jeff',
-                            email: 'jeff@amazon.com',
-                            password: 'prime_password'
-                        },
-                        {
-                            id: 11,
-                            name: 'Mark Zuckerberg',
-                            username: 'mark',
-                            email: 'mark@meta.com',
-                            password: 'meta_password'
-                        },
-                        {
-                            id: 12,
-                            name: 'Larry Page',
-                            username: 'larry',
-                            email: 'larry@google.com',
-                            password: 'search_password'
-                        }
-                    ];
+                    this.fetchData();
+                },
 
-                    if (this.ip.endsWith('53')) {
-                        this.credentials = dummyData.slice(0, 5);
-                    } else if (this.ip.endsWith('54')) {
-                        this.credentials = dummyData.slice(5, 12);
-                    } else {
-                        this.credentials = dummyData;
-                    }
-
-                    this.$nextTick(() => {
-                        lucide.createIcons();
-                    });
+                async fetchData() {
+                    const res = await fetch(`/api/credentials/${this.ip}`);
+                    this.credentials = await res.json();
+                    this.$nextTick(() => lucide.createIcons());
                 },
 
                 get filteredCredentials() {
                     const searchTerm = this.search.toLowerCase();
                     return this.credentials.filter(c =>
-                        c.name.toLowerCase().includes(searchTerm) ||
-                        c.username.toLowerCase().includes(searchTerm) ||
-                        c.email.toLowerCase().includes(searchTerm)
+                        (c.name?.toLowerCase() || '').includes(searchTerm) ||
+                        (c.username?.toLowerCase() || '').includes(searchTerm) ||
+                        (c.email?.toLowerCase() || '').includes(searchTerm)
                     );
                 },
 
@@ -519,38 +429,46 @@
                 edit(cred) {
                     this.isEditing = true;
                     this.form = {
-                        ...cred
+                        id: cred.id,
+                        name: cred.name,
+                        username: cred.username,
+                        email: cred.email,
+                        password: cred.password
                     };
                     this.isModalOpen = true;
                     this.$nextTick(() => lucide.createIcons());
                 },
 
-                save() {
+                async save() {
                     if (!this.form.name || !this.form.username) return;
 
-                    if (this.isEditing) {
-                        const index = this.credentials.findIndex(c => c.id === this.form.id);
-                        if (index !== -1) {
-                            this.credentials[index] = {
-                                ...this.form
-                            };
-                        }
-                        this.closeModal();
-                        this.showToast(`Data "${this.form.name}" berhasil diupdate.`, 'success');
-                    } else {
-                        const newId = Math.max(...this.credentials.map(c => c.id), 0) + 1;
-                        const savedName = this.form.name;
-                        this.credentials.push({
-                            ...this.form,
-                            id: newId
+                    try {
+                        const res = await fetch('/api/credentials', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector(
+                                    'meta[name="csrf-token"]').getAttribute('content')
+                            },
+                            body: JSON.stringify({
+                                id: this.form.id,
+                                server_ip: this.ip,
+                                name: this.form.name,
+                                username: this.form.username,
+                                email: this.form.email,
+                                password: this.form.password
+                            })
                         });
-                        this.closeModal();
-                        this.showToast(`Data "${savedName}" berhasil ditambahkan.`, 'success');
-                    }
 
-                    this.$nextTick(() => {
-                        lucide.createIcons();
-                    });
+                        if (res.ok) {
+                            await this.fetchData();
+                            this.closeModal();
+                            this.showToast(`Data "${this.form.name}" berhasil disimpan.`,
+                            'success');
+                        }
+                    } catch (e) {
+                        this.showToast('Gagal menyimpan data.', 'danger');
+                    }
                 },
 
                 confirmDelete(cred) {
@@ -566,17 +484,30 @@
                     this.isDeleteModalOpen = false;
                 },
 
-                executeDelete() {
+                async executeDelete() {
                     if (!this.deleteTarget) return;
-                    const name = this.deleteTarget.name;
-                    this.credentials = this.credentials.filter(c => c.id !== this.deleteTarget.id);
-                    this.isDeleteModalOpen = false;
-                    this.deleteTarget = null;
-                    this.showToast(`Data "${name}" berhasil dihapus.`, 'danger');
+                    try {
+                        const res = await fetch(`/api/credentials/${this.deleteTarget.id}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector(
+                                    'meta[name="csrf-token"]').getAttribute('content')
+                            }
+                        });
 
-                    // Adjust page if current page becomes empty
-                    if (this.paginatedCredentials.length === 0 && this.currentPage > 1) {
-                        this.currentPage--;
+                        if (res.ok) {
+                            const name = this.deleteTarget.name;
+                            await this.fetchData();
+                            this.isDeleteModalOpen = false;
+                            this.deleteTarget = null;
+                            this.showToast(`Data "${name}" berhasil dihapus.`, 'danger');
+
+                            if (this.paginatedCredentials.length === 0 && this.currentPage > 1) {
+                                this.currentPage--;
+                            }
+                        }
+                    } catch (e) {
+                        this.showToast('Gagal menghapus data.', 'danger');
                     }
                 },
             }))

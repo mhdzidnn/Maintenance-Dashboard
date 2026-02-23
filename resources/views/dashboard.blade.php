@@ -3,12 +3,12 @@
 @section('content')
     @php
         $now = \Carbon\Carbon::now();
-        $totalVms = array_sum(array_column($sites, 'total'));
-        $onlineCount = count(array_filter($sites, fn($s) => $s['status'] === 'online'));
-        $warningCount = count(array_filter($sites, fn($s) => $s['status'] === 'warning'));
-        $totalRunning = array_sum(array_column($sites, 'running'));
-        $avgCpu = count($sites) > 0 ? round(array_sum(array_column($sites, 'cpu')) / count($sites)) : 0;
-        $avgMem = count($sites) > 0 ? round(array_sum(array_column($sites, 'mem')) / count($sites)) : 0;
+        $totalVms = $sites->sum('total');
+        $onlineCount = $sites->where('status', 'online')->count();
+        $warningCount = $sites->where('status', 'warning')->count();
+        $totalRunning = $sites->sum('running');
+        $avgCpu = $sites->avg('cpu') ?? 0;
+        $avgMem = $sites->avg('mem') ?? 0;
     @endphp
 
     <div class="space-y-6">

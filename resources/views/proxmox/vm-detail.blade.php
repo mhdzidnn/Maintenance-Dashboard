@@ -11,7 +11,7 @@
                 </div>
                 <div>
                     <h1 class="text-2xl font-bold text-slate-800">{{ $vm->name }} ({{ $vm->id }})</h1>
-                    <p class="text-slate-500">Node: {{ $vm->node }} &bull; Status: <span
+                    <p class="text-slate-500">Node: {{ $vm->node->name ?? 'unknown' }} &bull; Status: <span
                             class="{{ $vm->status == 'running' ? 'text-green-600' : 'text-slate-500' }} uppercase font-bold">{{ $vm->status }}</span>
                     </p>
                 </div>

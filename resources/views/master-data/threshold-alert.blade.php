@@ -133,7 +133,8 @@
                         <input type="range" min="50" max="100" step="5" x-model="form.cpu"
                             class="w-full h-2 rounded-full accent-blue-500 cursor-pointer">
                         <div class="flex justify-between text-[10px] text-slate-400">
-                            <span>50%</span><span>75%</span><span>100%</span></div>
+                            <span>50%</span><span>75%</span><span>100%</span>
+                        </div>
                     </div>
                     <div class="space-y-2">
                         <label class="text-xs font-bold text-slate-600 uppercase tracking-wider flex justify-between">
@@ -144,7 +145,8 @@
                         <input type="range" min="50" max="100" step="5" x-model="form.mem"
                             class="w-full h-2 rounded-full accent-violet-500 cursor-pointer">
                         <div class="flex justify-between text-[10px] text-slate-400">
-                            <span>50%</span><span>75%</span><span>100%</span></div>
+                            <span>50%</span><span>75%</span><span>100%</span>
+                        </div>
                     </div>
                     <div class="space-y-2">
                         <label class="text-xs font-bold text-slate-600 uppercase tracking-wider flex justify-between">
@@ -155,7 +157,8 @@
                         <input type="range" min="50" max="100" step="5" x-model="form.disk"
                             class="w-full h-2 rounded-full accent-amber-500 cursor-pointer">
                         <div class="flex justify-between text-[10px] text-slate-400">
-                            <span>50%</span><span>75%</span><span>100%</span></div>
+                            <span>50%</span><span>75%</span><span>100%</span>
+                        </div>
                     </div>
                 </div>
                 <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
@@ -201,39 +204,15 @@
                     message: '',
                     timer: null
                 },
-                data: [{
-                        id: 1,
-                        nama: 'AGS',
-                        key: 'ags',
-                        cpu: 80,
-                        mem: 80,
-                        disk: 85
-                    },
-                    {
-                        id: 2,
-                        nama: 'Kantor Pusat',
-                        key: 'pusat',
-                        cpu: 80,
-                        mem: 80,
-                        disk: 85
-                    },
-                    {
-                        id: 3,
-                        nama: 'Punggur',
-                        key: 'punggur',
-                        cpu: 75,
-                        mem: 75,
-                        disk: 80
-                    },
-                    {
-                        id: 4,
-                        nama: 'Sekupang',
-                        key: 'sekupang',
-                        cpu: 80,
-                        mem: 80,
-                        disk: 85
-                    },
-                ],
+                data: @json(
+                    $sites->map(fn($s) => [
+                            'id' => $s->id,
+                            'nama' => $s->name,
+                            'key' => $s->key,
+                            'cpu' => $s->thresholdAlert->cpu_limit ?? 80,
+                            'mem' => $s->thresholdAlert->mem_limit ?? 80,
+                            'disk' => $s->thresholdAlert->disk_limit ?? 80,
+                        ])),
                 showToast(message) {
                     clearTimeout(this.toast.timer);
                     this.toast = {
@@ -253,13 +232,35 @@
                 closeModal() {
                     this.isModalOpen = false;
                 },
-                save() {
-                    const i = this.data.findIndex(d => d.id === this.form.id);
-                    if (i !== -1) this.data[i] = {
-                        ...this.form
-                    };
-                    this.closeModal();
-                    this.showToast(`Threshold Proxmox ${this.form.nama} berhasil disimpan.`);
+                async save() {
+                    try {
+                        const res = await fetch('/api/master-data/threshold', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector(
+                                    'meta[name="csrf-token"]').getAttribute('content')
+                            },
+                            body: JSON.stringify({
+                                site_id: this.form.id,
+                                cpu_limit: this.form.cpu,
+                                mem_limit: this.form.mem,
+                                disk_limit: this.form.disk
+                            })
+                        });
+
+                        if (res.ok) {
+                            const i = this.data.findIndex(d => d.id === this.form.id);
+                            if (i !== -1) this.data[i] = {
+                                ...this.form
+                            };
+                            this.closeModal();
+                            this.showToast(
+                            `Threshold Proxmox ${this.form.nama} berhasil disimpan.`);
+                        }
+                    } catch (e) {
+                        this.showToast('Gagal menyimpan threshold.');
+                    }
                 },
             }));
         });

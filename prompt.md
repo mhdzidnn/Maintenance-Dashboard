@@ -75,25 +75,27 @@ The sidebar navigation MUST be fully functional from the start. Implement these 
 ### Web Routes (`routes/web.php`)
 ```php
 Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
+    // Dashboard
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
     // Proxmox Section
-    Route::get('/proxmox', [ProxmoxController::class, 'index'])->name('proxmox.index');
-    Route::get('/proxmox/nodes', [ProxmoxController::class, 'nodes'])->name('proxmox.nodes');
-    Route::get('/proxmox/storage', [ProxmoxController::class, 'storage'])->name('proxmox.storage');
-    Route::get('/proxmox/vms', [ProxmoxController::class, 'vms'])->name('proxmox.vms');
-    Route::get('/proxmox/memory', [ProxmoxController::class, 'memory'])->name('proxmox.memory');
-    
-    // Nextcloud Section
-    Route::get('/nextcloud', [NextcloudController::class, 'index'])->name('nextcloud.index');
-    Route::get('/nextcloud/overview', [NextcloudController::class, 'overview'])->name('nextcloud.overview');
-    Route::get('/nextcloud/users', [NextcloudController::class, 'users'])->name('nextcloud.users');
-    Route::get('/nextcloud/storage', [NextcloudController::class, 'storage'])->name('nextcloud.storage');
-    
-    // System Section
-    Route::get('/system', [SystemController::class, 'index'])->name('system.index');
-    Route::get('/system/alerts', [SystemController::class, 'alerts'])->name('system.alerts');
-    Route::get('/system/logs', [SystemController::class, 'logs'])->name('system.logs');
+    Route::prefix('proxmox')->name('proxmox.')->group(function () {
+        Route::get('/', [ProxmoxController::class, 'index'])->name('index'); // Keep this for the main proxmox page
+        Route::get('/nodes/{location?}', [ProxmoxController::class, 'nodes'])->name('nodes');
+        Route::get('/datacenter/{location?}', [ProxmoxController::class, 'datacenter'])->name('datacenter');
+        Route::get('/vm/{location}/{vm_id}', [ProxmoxController::class, 'vmDetail'])->name('vm_detail');
+    });
+
+    // Credential Management
+    Route::get('/credentials/{ip}', function ($ip) {
+        return view('credentials.index', ['ip' => $ip]);
+    })->name('credentials.index');
+
+    // Master Data Section
+    Route::prefix('master-data')->name('master-data.')->group(function () {
+        Route::get('/lokasi-proxmox', [MasterDataController::class, 'lokasiProxmox'])->name('lokasi-proxmox');
+        Route::get('/threshold-alert', [MasterDataController::class, 'thresholdAlert'])->name('threshold-alert');
+    });
 });
 ```
 
@@ -101,77 +103,45 @@ Route::middleware(['auth'])->group(function () {
 Create a sidebar component with these menu items:
 ```
 📊 Dashboard (/)
-├── 🖥️ Proxmox AGS
-│   ├── VMS
-├── 🖥️ Proxmox Punggur
-│   ├── VMS
-├── 🖥️ Proxmox Kantor Pusat
-│   ├── VMS
-├── 🖥️ Proxmox Sekupang
-│   ├── VMS
+
+--- INFRASTRUCTURE ---
+🖥️ Proxmox Sites (AGS, Pusat, Punggur, Sekupang)
+  ├── 📊 Datacenter Summary
+  └── 🖥️ Node: pve
+      ├── 📦 VM Items (Dynamic Icons: Monitor, Box, Drive, Network)
+
+--- CREDENTIAL PASSWORD VM ---
+🔐 Server 10.13.15.52
+🔐 Server 10.13.15.53
+🔐 Server 10.13.15.54
+
+--- MASTER DATA ---
+📍 Lokasi Proxmox
+🔔 Threshold Alert
+```
 
 ### Navigation Interaction Requirements:
-- **Active state styling:** Current page should be highlighted
-- **Hover effects:** Smooth color transition on menu item hover
-- **Expandable sections:** Proxmox, Nextcloud, System sections can expand/collapse
-- **Icon indicators:** Show chevron (>) for expandable sections
-- **Smooth transitions:** Use Alpine.js for smooth expand/collapse animations
-- **Mobile responsive:** Sidebar collapses to hamburger menu on mobile
+- **Active state styling:** Current page should be highlighted with a glassmorphism ring and accent color.
+- **Dynamic Icons:** Sub-menu Proxmox items must show icons based on type (qemu → monitor, lxc → layers, storage → hard-drive, sdn → share-2).
+- **Expandable sections:** Proxmox sections use Alpine.js `openSections` with LocalStorage persistence.
+- **Smooth transitions:** 300ms transitions for all hover and expand actions.
+- **Mobile responsive:** Sidebar collapses and uses a backdrop on smaller screens.
 
 ---
 
-# 5. Data Visualization with Dummy Data
+# 5. Advanced Features
 
-## CRITICAL REQUIREMENT: Show Real Visualizations Immediately
+## A. Master Data Management
+Implement CRUD modules for managing infrastructure metadata:
+1. **Lokasi Proxmox:** Create, Read, Update, Delete for site name, key, IP address, and description.
+2. **Threshold Alert:** Configure CPU, Memory, and Disk alert limits per site using interactive sliders.
 
-DO NOT wait for API integration. Use comprehensive dummy data from seeders to populate all charts and visualizations.
-
-### Required Visualizations:
-
-#### A. Storage Health Chart
-- **Type:** Horizontal Progress Bar with gradient
-- **Dummy Data:** 85% used (1.5 TB / 1.7 TB)
-- **Visual:** Orange-to-red gradient fill
-- **Labels:** Show percentage, absolute values, and trend (+4%/week)
-
-#### B. VM Usage Chart
-- **Type:** Vertical bar chart or list with usage bars
-- **Dummy Data:**
-```
-  VM 110 (Backup): 450 GB
-  VM 105 (DB Server): 300 GB
-  VM 101 (Web Server): 120 GB
-```
-- **Visual:** Horizontal bars with blue gradient
-
-#### C. Nextcloud Storage Gauge
-- **Type:** Circular progress or horizontal bar
-- **Dummy Data:** 2.3 TB / 5 TB (46%)
-- **Visual:** Blue accent color
-
-#### D. User Quota Warning
-- **Type:** Progress bar with warning indicator
-- **Dummy Data:** User "andi" at 94% (4.7 GB / 5 GB)
-- **Visual:** Orange/red warning color
-
-#### E. Recent Logins Timeline
-- **Type:** Timeline list with timestamps
-- **Dummy Data:**
-```
-  joko - 5 mins ago
-  ana - 1 hour ago
-  susi - 2 days ago
-```
-- **Visual:** Small circular avatars with activity bars
-
-#### F. System Alerts Widget
-- **Type:** Badge list with icons
-- **Dummy Data:**
-```
-  ⚠️ LOCAL-LVM Usage High! 85% (1.5 TB / 1.7 TB)
-  🔺 Nextcloud: User Quota Exceeded
-```
-- **Visual:** Warning (orange) and Critical (red) badges
+## B. Credential Management (DataTable)
+The Credential page features a robust, reactive table built with Alpine.js:
+- **Search:** Instant real-time filtering across name, username, and email.
+- **Page Size:** Toggle between 5, 10, 25, or 50 entries per page.
+- **Pagination:** "First", "Previous", "Next", and "Last" navigation with dynamic status text.
+- **Security:** Password field is masked by default with a "show/hide" eye icon.
 
 ---
 
@@ -541,38 +511,25 @@ class ExternalApiService
 
 Execute in this exact order:
 
-## Phase 1: Foundation (Day 1)
-1. ✅ Initialize Laravel project
-2. ✅ Install Livewire, Tailwind CSS, Chart.js
-3. ✅ Create all database migrations
-4. ✅ Create all Models with relationships
-5. ✅ Create all Seeders with dummy data
-6. ✅ Run migrations and seed database
+## Phase 1: Foundation ✅
+1. ✅ Initialize Laravel 11 project
+2. ✅ Install Tailwind CSS v4, Alpine.js, Lucide Icons
+3. ✅ Register all core routes and controllers
 
-## Phase 2: Layout & Navigation (Day 1)
-1. ✅ Create app layout (`resources/views/layouts/app.blade.php`)
-2. ✅ Build Sidebar Livewire component (fully functional)
-3. ✅ Create all route definitions
-4. ✅ Create all Controllers (Dashboard, Proxmox, Nextcloud, System)
-5. ✅ Test navigation (expand/collapse, active states)
+## Phase 2: Layout & Navigation ✅
+1. ✅ Build Premium Sidebar with Glassmorphism
+2. ✅ Implement Expand/Collapse with LocalStorage persistence
+3. ✅ Add sub-menu icons with color-coding by type
 
-## Phase 3: Dashboard Cards (Day 2)
-1. ✅ Node Status Card (with health badge)
-2. ✅ Storage Health Card (with gradient progress bar)
-3. ✅ VM Usage Card (top 3 VMs)
-4. ✅ Nextcloud Overview Card
-5. ✅ User Quota Warning Card
-6. ✅ Recent Logins Card
-7. ✅ System Alerts Card
-8. ✅ Quick Actions Panel
+## Phase 3: Real Data Integration ✅
+1. ✅ Extract VM data into a single source of truth (Object-based)
+2. ✅ Wire Dashboard summary cards to real stats
+3. ✅ Implement dynamic alert badges (CPU/MEM > 80%)
 
-## Phase 4: Polish & Testing (Day 3)
-1. ✅ Responsive design testing
-2. ✅ Add loading states
-3. ✅ Add hover effects and transitions
-4. ✅ Test all navigation links
-5. ✅ Verify dummy data displays correctly
-6. ✅ Add documentation comments
+## Phase 4: Master Data & CRUD ✅
+1. ✅ Build Master Data Location module
+2. ✅ Build Alert Threshold module with sliders
+3. ✅ Build Credential Management with Search & Pagination
 
 ---
 

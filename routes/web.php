@@ -24,6 +24,8 @@ Route::middleware([DummyAuth::class])->group(function () {
     Route::get('/proxmox/nodes/{location?}', [ProxmoxController::class, 'nodes'])->name('proxmox.nodes');
     Route::get('/proxmox/datacenter/{location?}', [ProxmoxController::class, 'datacenter'])->name('proxmox.datacenter');
     Route::get('/proxmox/vm/{location}/{vm_id}', [ProxmoxController::class, 'vmDetail'])->name('proxmox.vm_detail');
+    Route::get('/proxmox/storage/{location}/{id}', [ProxmoxController::class, 'storageDetail'])->name('proxmox.storage_detail');
+    Route::get('/proxmox/network/{location}/{id}', [ProxmoxController::class, 'networkDetail'])->name('proxmox.network_detail');
 
     // Nextcloud Section
     Route::get('/nextcloud', [NextcloudController::class, 'index'])->name('nextcloud.index');
@@ -38,11 +40,17 @@ Route::middleware([DummyAuth::class])->group(function () {
     Route::get('/system/logs', [SystemController::class, 'logs'])->name('system.logs');
 
     // Credential Management
-    Route::get('/credentials/{ip}', function ($ip) {
-        return view('credentials.index', ['ip' => $ip]);
-    })->name('credentials.index');
+    Route::get('/credentials/{ip}', [App\Http\Controllers\CredentialController::class, 'index'])->name('credentials.index');
+    Route::get('/api/credentials/{ip}', [App\Http\Controllers\CredentialController::class, 'getCredentials']);
+    Route::post('/api/credentials', [App\Http\Controllers\CredentialController::class, 'store']);
+    Route::delete('/api/credentials/{id}', [App\Http\Controllers\CredentialController::class, 'destroy']);
 
     // Master Data
     Route::get('/master-data/lokasi-proxmox', [MasterDataController::class, 'lokasiProxmox'])->name('master-data.lokasi-proxmox');
+    Route::get('/api/master-data/lokasi', [MasterDataController::class, 'getLokasi']);
+    Route::post('/api/master-data/lokasi', [MasterDataController::class, 'storeLokasi']);
+    Route::delete('/api/master-data/lokasi/{id}', [MasterDataController::class, 'deleteLokasi']);
+
     Route::get('/master-data/threshold-alert', [MasterDataController::class, 'thresholdAlert'])->name('master-data.threshold-alert');
+    Route::post('/api/master-data/threshold', [MasterDataController::class, 'updateThreshold']);
 });
